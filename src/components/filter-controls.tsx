@@ -13,6 +13,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from './ui/button';
 import { RotateCcw } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
+
 
 type Filters = {
   brand: string;
@@ -29,6 +31,7 @@ type FilterControlsProps = {
 };
 
 export default function FilterControls({ cars, filters, setFilters }: FilterControlsProps) {
+  const isMobile = useIsMobile();
   const brands = ['all', ...Array.from(new Set(cars.map((car) => car.brand)))];
   const models = [
     'all',
@@ -56,9 +59,18 @@ export default function FilterControls({ cars, filters, setFilters }: FilterCont
     });
   };
 
+  const containerClasses = isMobile
+    ? "flex flex-col gap-4"
+    : "p-4 md:p-6 bg-card rounded-lg shadow-md border";
+    
+  const gridClasses = isMobile
+    ? "flex flex-col gap-4"
+    : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4 items-end";
+
+
   return (
-    <div className="p-4 md:p-6 bg-card rounded-lg shadow-md border">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4 items-end">
+    <div className={containerClasses}>
+      <div className={gridClasses}>
         <div>
           <Label htmlFor="brand">Marka</Label>
           <Select
@@ -149,5 +161,3 @@ export default function FilterControls({ cars, filters, setFilters }: FilterCont
     </div>
   );
 }
-
-    

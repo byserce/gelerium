@@ -6,10 +6,13 @@ import type { Car } from '@/lib/types';
 import CarCard from '@/components/car-card';
 import FilterControls from '@/components/filter-controls';
 import { Skeleton } from '@/components/ui/skeleton';
-import Image from 'next/image';
 import { MapPin, Building, Users } from 'lucide-react';
 import DealershipMap from '@/components/map';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
+import { Button } from '@/components/ui/button';
+import { Filter } from 'lucide-react';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { useIsMobile } from '@/hooks/use-mobile';
+
 
 type Filters = {
   brand: string;
@@ -30,7 +33,7 @@ export default function HomePage() {
     maxPrice: 10000000,
   });
 
-  const heroImage = PlaceHolderImages.find(p => p.id === 'hero-background');
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     const fetchCars = async () => {
@@ -72,28 +75,14 @@ export default function HomePage() {
     });
   }, [cars, filters]);
 
+  const FilterComponent = () => (
+    <FilterControls cars={cars} filters={filters} setFilters={setFilters} />
+  );
+
   return (
     <div className="flex flex-col min-h-screen">
       <main className="flex-1">
-        {/* Hero Section */}
-        <section className="relative h-[50vh] min-h-[300px] w-full text-white">
-          <div className="absolute inset-0 bg-black/50 z-10" />
-          {heroImage && (
-            <Image
-              src={heroImage.imageUrl}
-              alt={heroImage.description}
-              fill
-              className="object-cover"
-              priority
-              data-ai-hint={heroImage.imageHint}
-            />
-          )}
-          <div className="container mx-auto flex h-full flex-col items-center justify-center text-center relative z-20">
-            <h1 className="text-4xl md:text-6xl font-headline font-bold tracking-tight text-shadow-lg">Avşarlı Otomotiv</h1>
-            <p className="mt-4 max-w-2xl text-lg md:text-xl text-white/90 text-shadow">Güvenilir ve kaliteli ikinci el araç alım satımının doğru adresi.</p>
-          </div>
-        </section>
-
+        
         {/* Listings Section */}
         <section id="listings" className="py-12 md:py-20 bg-background">
           <div className="container mx-auto px-4">
@@ -101,7 +90,26 @@ export default function HomePage() {
             <p className="text-muted-foreground text-center mb-8 max-w-2xl mx-auto">
               Size en uygun aracı bulmak için filtreleri kullanın. Beğendiğiniz araç hakkında bilgi almak için bizimle iletişime geçmekten çekinmeyin.
             </p>
-            <FilterControls cars={cars} filters={filters} setFilters={setFilters} />
+            
+            {isMobile ? (
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="outline" className="w-full">
+                    <Filter className="mr-2 h-4 w-4" />
+                    Filtrele
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="bottom" className="h-[75%] flex flex-col">
+                    <h3 className="text-lg font-semibold p-4 border-b">Filtrele</h3>
+                    <div className="overflow-y-auto p-4 flex-1">
+                        <FilterComponent />
+                    </div>
+                </SheetContent>
+              </Sheet>
+            ) : (
+              <FilterComponent />
+            )}
+
 
             <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
               {loading
