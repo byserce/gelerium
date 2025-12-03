@@ -87,8 +87,8 @@ export default function HomePage() {
         <section id="listings" className="py-12 md:py-20 bg-background">
           <div className="container mx-auto px-4">
             <h2 className="text-3xl font-bold text-center mb-4">Araçlarımız</h2>
-            <p className="text-muted-foreground text-center mb-8 max-w-2xl mx-auto">
-              Size en uygun aracı bulmak için filtreleri kullanın. Beğendiğiniz araç hakkında bilgi almak için bizimle iletişime geçmekten çekinmeyin.
+            <p className="text-muted-foreground text-center text-sm mb-8 max-w-lg mx-auto">
+              Size en uygun ikinci el aracı bulmak için aşağıdaki filtreleri kullanabilirsiniz.
             </p>
             
             {isMobile ? (
@@ -111,7 +111,7 @@ export default function HomePage() {
             )}
 
 
-            <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+            <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
               {loading
                 ? Array.from({ length: 8 }).map((_, i) => (
                     <div key={i} className="flex flex-col space-y-3">
