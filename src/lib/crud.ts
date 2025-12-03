@@ -1,8 +1,10 @@
 import { supabase } from './supabaseClient';
 import { v4 as uuidv4 } from 'uuid';
+import type { Car } from './types';
+
 
 // Helper function to upload images and get their URLs and paths
-async function uploadImages(files: FileList) {
+async function uploadImages(files: File[]) {
     const imageUrls: string[] = [];
     const imagePaths: string[] = [];
 
@@ -36,13 +38,13 @@ async function uploadImages(files: FileList) {
 
 
 // Adds a new car to the 'listings' table
-export async function addCar(data: any) {
+export async function addCar(data: any, images: File[]) {
     let newImageUrls: string[] = [];
     let newImagePaths: string[] = [];
 
     // Upload new images if they exist
-    if (data.images && data.images.length > 0) {
-        const { imageUrls, imagePaths } = await uploadImages(data.images);
+    if (images && images.length > 0) {
+        const { imageUrls, imagePaths } = await uploadImages(images);
         newImageUrls = imageUrls;
         newImagePaths = imagePaths;
     }
@@ -56,7 +58,6 @@ export async function addCar(data: any) {
         price: Number(data.price),
         kilometer: Number(data.km),
         image_urls: newImageUrls,
-        image_paths: newImagePaths,
     };
 
     const { error } = await supabase.from('listings').insert([carData]);
@@ -75,14 +76,13 @@ export async function updateCar(data: any, imagesToRemove: string[], existingPat
 
     // 1. Upload new images if any
     if (data.images && data.images.length > 0) {
-        const { imageUrls, imagePaths } = await uploadImages(data.images);
+        const { imageUrls, imagePaths } = await uploadImages(Array.from(data.images));
         newImageUrls = imageUrls;
         newImagePaths = imagePaths;
     }
 
     // 2. Remove images from storage if marked for deletion
     if (imagesToRemove.length > 0) {
-        // We need to get the full path from the URL
          const pathsToRemove = existingPaths.filter(path => {
             const publicURL = supabase.storage.from('vehicle-images').getPublicUrl(path).data.publicUrl;
             return imagesToRemove.includes(publicURL);
@@ -92,19 +92,11 @@ export async function updateCar(data: any, imagesToRemove: string[], existingPat
             const { error: storageError } = await supabase.storage.from('vehicle-images').remove(pathsToRemove);
             if (storageError) {
                 console.error("Error removing images from storage:", storageError);
-                // Decide if you want to throw an error or just log it
-                // For now, we'll log and continue
             }
         }
     }
-
-    // 3. Prepare the final data for the database update
+    
     const finalImageUrls = [...(data.existingImageUrls || []), ...newImageUrls];
-    const remainingPaths = existingPaths.filter(path => {
-        const publicURL = supabase.storage.from('vehicle-images').getPublicUrl(path).data.publicUrl;
-        return data.existingImageUrls.includes(publicURL);
-    });
-    const finalImagePaths = [...remainingPaths, ...newImagePaths];
 
     const carData = {
         title: data.title,
@@ -114,7 +106,6 @@ export async function updateCar(data: any, imagesToRemove: string[], existingPat
         price: Number(data.price),
         kilometer: Number(data.km),
         image_urls: finalImageUrls,
-        image_paths: finalImagePaths,
     };
 
     const { error } = await supabase
