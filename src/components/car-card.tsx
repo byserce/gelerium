@@ -61,7 +61,7 @@ export default function CarCard({ car }: CarCardProps) {
       <CardFooter className="p-4 bg-muted/50">
         <Button asChild className="w-full bg-primary hover:bg-accent text-primary-foreground hover:text-accent-foreground">
           <Link href={car.listingUrl} target="_blank" rel="noopener noreferrer">
-            Detayları İncele
+            Sahibinden.com'da Gör
           </Link>
         </Button>
       </CardFooter>
