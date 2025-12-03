@@ -5,7 +5,7 @@ import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
 import WhatsAppButton from '@/components/whatsapp-button';
 import { cn } from '@/lib/utils';
-import { FirebaseClientProvider } from '@/firebase';
+
 
 export const metadata: Metadata = {
   title: 'Avşarlı Digital Showroom',
@@ -26,7 +26,6 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
       </head>
       <body className={cn('font-body antialiased', 'min-h-screen bg-background font-sans')}>
-        <FirebaseClientProvider>
           <div className="relative flex min-h-screen flex-col">
             <Header />
             <main className="flex-1">{children}</main>
@@ -34,7 +33,6 @@ export default function RootLayout({
           </div>
           <WhatsAppButton />
           <Toaster />
-        </FirebaseClientProvider>
       </body>
     </html>
   );
