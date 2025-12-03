@@ -12,16 +12,16 @@ const partIdMap: Record<string, string> = {
     'Kaput': 'hood',
     'Tavan': 'roof',
     'Bagaj': 'trunk',
-    'Sağ Ön Çamurluk': 'front_fender_right',
-    'Sağ Ön Kapı': 'front_door_right',
-    'Sağ Arka Kapı': 'rear_door_right',
-    'Sağ Arka Çamurluk': 'rear_fender_right',
-    'Sol Ön Çamurluk': 'front_fender_left',
-    'Sol Ön Kapı': 'front_door_left',
-    'Sol Arka Kapı': 'rear_door_left',
-    'Sol Arka Çamurluk': 'rear_fender_left',
-    'Ön Tampon': 'front_bumper',
-    'Arka Tampon': 'rear_bumper'
+    'Sağ Ön Çamurluk': 'front-fender-right',
+    'Sağ Ön Kapı': 'front-door-right',
+    'Sağ Arka Kapı': 'rear-door-right',
+    'Sağ Arka Çamurluk': 'rear-fender-right',
+    'Sol Ön Çamurluk': 'front-fender-left',
+    'Sol Ön Kapı': 'front-door-left',
+    'Sol Arka Kapı': 'rear-door-left',
+    'Sol Arka Çamurluk': 'rear-fender-left',
+    'Ön Tampon': 'front-bumper',
+    'Arka Tampon': 'rear-bumper'
 };
 
 const statusColors: Record<string, string> = {
@@ -32,112 +32,54 @@ const statusColors: Record<string, string> = {
 
 
 export default function ExpertiseVisualizer({ report }: ExpertiseVisualizerProps) {
-    const getPartColor = (partName: string) => {
-        const partKey = Object.keys(partIdMap).find(key => partIdMap[key] === partName);
+    const getPartColor = (partKey: string) => {
         if (!partKey) return statusColors['Orijinal'];
-
         const status = report[partKey] || 'Orijinal';
         return statusColors[status] || statusColors['Orijinal'];
     };
+    
+    const partKeys = Object.keys(partIdMap);
 
     return (
         <div className="flex flex-col items-center">
             <svg
                 width="100%"
                 height="auto"
-                viewBox="0 0 800 400"
+                viewBox="0 0 450 550"
                 xmlns="http://www.w3.org/2000/svg"
-                className="max-w-md"
+                className="max-w-xs"
             >
-                <g id="car-body" className="stroke-gray-600 stroke-2">
-                    {/* Main Body */}
-                    <path
-                        id="front_fender_left"
-                        d="M 150,250 L 200,250 L 200,200 L 150,200 Z"
-                        className={cn("transition-colors", getPartColor('front_fender_left'))}
-                    />
-                    <path
-                        id="hood"
-                        d="M 200,250 L 350,250 L 350,180 L 200,180 Z"
-                        className={cn("transition-colors", getPartColor('hood'))}
-                    />
-                    <path
-                        id="front_fender_right"
-                        d="M 350,250 L 400,250 L 400,200 L 350,200 Z"
-                        className={cn("transition-colors", getPartColor('front_fender_right'))}
-                    />
-
-                    {/* Cabin */}
-                    <path
-                        id="roof"
-                        d="M 250,180 L 300,180 L 300,130 L 250,130 Z"
-                        className={cn("transition-colors", getPartColor('roof'))}
-                    />
-                    <rect id="windshield" x="220" y="180" width="110" height="20" className="fill-gray-400/50" />
+                <g id="car-schema" stroke="#6b7280" strokeWidth="1">
+                    {/* Left Side */}
+                    <g id="left-panels" transform="translate(50, 50)">
+                         <text x="35" y="-10" textAnchor="middle" fontSize="14" fill="#6b7280">Sol</text>
+                        <path id={partIdMap['Sol Ön Çamurluk']} className={cn("transition-colors", getPartColor('Sol Ön Çamurluk'))} d="M0,50 Q20,60 70,50 L70,0 L20,0 Q0,10 0,50 Z" />
+                        <path id={partIdMap['Sol Ön Kapı']} className={cn("transition-colors", getPartColor('Sol Ön Kapı'))} d="M0,55 L70,55 L70,155 L0,155 Z" />
+                        <path id={partIdMap['Sol Arka Kapı']} className={cn("transition-colors", getPartColor('Sol Arka Kapı'))} d="M0,160 L70,160 L70,260 L0,260 Z" />
+                        <path id={partIdMap['Sol Arka Çamurluk']} className={cn("transition-colors", getPartColor('Sol Arka Çamurluk'))} d="M0,265 L70,265 L70,315 Q20,315 0,265 Z" />
+                    </g>
                     
-                    {/* Doors */}
-                    <path
-                        id="front_door_left"
-                        d="M 200,250 L 250,250 L 250,200 L 200,200 Z"
-                        className={cn("transition-colors", getPartColor('front_door_left'))}
-                    />
-                    <path
-                        id="rear_door_left"
-                        d="M 250,250 L 300,250 L 300,200 L 250,200 Z"
-                        className={cn("transition-colors", getPartColor('rear_door_left'))}
-                    />
-                    <path
-                        id="front_door_right"
-                        d="M 300,250 L 350,250 L 350,200 L 300,200 Z"
-                        className={cn("transition-colors", getPartColor('front_door_right'))}
-                    />
-                    <path
-                        id="rear_door_right"
-                        d="M 350,250 L 400,250 L 400,200 L 350,200 Z"
-                        className={cn("transition-colors", getPartColor('rear_door_right'))}
-                    />
+                    {/* Center Column */}
+                    <g id="center-panels" transform="translate(150, 0)">
+                        <path id={partIdMap['Ön Tampon']} className={cn("transition-colors", getPartColor('Ön Tampon'))} d="M0,30 L150,30 L130,0 L20,0 Z" />
+                        <path id={partIdMap['Kaput']} className={cn("transition-colors", getPartColor('Kaput'))} d="M0,35 L150,35 L150,135 L0,135 Z" />
+                        <path id={partIdMap['Tavan']} className={cn("transition-colors", getPartColor('Tavan'))} d="M0,140 L150,140 L150,290 L0,290 Z" />
+                        <path id={partIdMap['Bagaj']} className={cn("transition-colors", getPartColor('Bagaj'))} d="M0,295 L150,295 L150,395 L0,395 Z" />
+                        <path id={partIdMap['Arka Tampon']} className={cn("transition-colors", getPartColor('Arka Tampon'))} d="M20,425 L130,425 L150,395 L0,395 Z" />
+                    </g>
 
-                    {/* Rear */}
-                     <path
-                        id="rear_fender_left"
-                        d="M 300,250 L 350,250 L 350,200 L 300,200 Z"
-                        className={cn("transition-colors", getPartColor('rear_fender_left'))}
-                    />
-                    <path
-                        id="trunk"
-                        d="M 400,250 L 550,250 L 550,180 L 400,180 Z"
-                        className={cn("transition-colors", getPartColor('trunk'))}
-                    />
-                    <path
-                        id="rear_fender_right"
-                        d="M 550,250 L 600,250 L 600,200 L 550,200 Z"
-                        className={cn("transition-colors", getPartColor('rear_fender_right'))}
-                    />
-                    
-                     {/* Bumpers */}
-                    <path 
-                        id="front_bumper"
-                        d="M 130,255 L 420,255 L 420, 275 L 130,275 Z"
-                        className={cn("transition-colors", getPartColor('front_bumper'))}
-                    />
-                    <path 
-                        id="rear_bumper"
-                        d="M 380,255 L 670,255 L 670,275 L 380,275 Z"
-                        className={cn("transition-colors", getPartColor('rear_bumper'))}
-                        transform="translate(150, -55) rotate(0)"
-                    />
+                    {/* Right Side */}
+                    <g id="right-panels" transform="translate(330, 50)">
+                         <text x="35" y="-10" textAnchor="middle" fontSize="14" fill="#6b7280">Sağ</text>
+                        <path id={partIdMap['Sağ Ön Çamurluk']} className={cn("transition-colors", getPartColor('Sağ Ön Çamurluk'))} d="M0,0 L50,0 Q70,10 70,50 Q50,60 0,50 L0,0 Z" />
+                        <path id={partIdMap['Sağ Ön Kapı']} className={cn("transition-colors", getPartColor('Sağ Ön Kapı'))} d="M0,55 L70,55 L70,155 L0,155 Z" />
+                        <path id={partIdMap['Sağ Arka Kapı']} className={cn("transition-colors", getPartColor('Sağ Arka Kapı'))} d="M0,160 L70,160 L70,260 L0,260 Z" />
+                        <path id={partIdMap['Sağ Arka Çamurluk']} className={cn("transition-colors", getPartColor('Sağ Arka Çamurluk'))} d="M0,315 L50,315 Q70,265 0,265 Z" />
+                    </g>
                 </g>
-
-                {/* Simplified Car Shape for context - a more complex SVG would be better */}
-                 <path d="M130 250 C 120 230, 120 200, 150 200 H 200 V 180 C 200 160, 220 130, 250 130 H 300 C 330 130, 350 160, 350 180 V 200 H 400 C 430 200, 450 230, 460 250 H 650 C 670 250, 680 270, 650 280 L 630 290 H 220 L 200 280 C 170 270, 180 250, 130 250 Z" 
-                 fill="none" stroke="black" strokeWidth="2"/>
-
-                {/* Wheels */}
-                <circle cx="235" cy="290" r="20" fill="black" />
-                <circle cx="595" cy="290" r="20" fill="black" />
             </svg>
 
-             <div className="mt-4 flex flex-wrap justify-center gap-x-6 gap-y-2">
+             <div className="mt-6 flex flex-wrap justify-center gap-x-6 gap-y-2">
                 <div className="flex items-center gap-2">
                     <div className="h-4 w-4 rounded-sm bg-gray-300 border border-gray-400"></div>
                     <span className="text-sm text-muted-foreground">Orijinal</span>
@@ -150,6 +92,27 @@ export default function ExpertiseVisualizer({ report }: ExpertiseVisualizerProps
                     <div className="h-4 w-4 rounded-sm bg-red-500 border border-red-600"></div>
                     <span className="text-sm text-muted-foreground">Değişen</span>
                 </div>
+            </div>
+
+            <div className="mt-6 w-full max-w-md space-y-2">
+                {partKeys.map(key => {
+                    const status = report[key];
+                    if(status && status !== 'Orijinal') {
+                        return (
+                             <div key={key} className="flex justify-between items-center bg-muted/50 p-2 rounded-md text-sm">
+                                <span className="text-foreground">{key}</span>
+                                <span className={cn(
+                                    "font-semibold",
+                                    status === 'Boyalı' && 'text-yellow-600',
+                                    status === 'Değişen' && 'text-red-600',
+                                )}>
+                                    {status}
+                                </span>
+                            </div>
+                        )
+                    }
+                    return null;
+                })}
             </div>
         </div>
     );

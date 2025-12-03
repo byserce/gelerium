@@ -115,7 +115,7 @@ export default function ListingDetailPage({ params }: PageProps) {
               {car.imageUrls && car.imageUrls.length > 0 ? (
                 car.imageUrls.map((url, index) => (
                   <CarouselItem key={index}>
-                    <div className="aspect-video relative overflow-hidden rounded-lg">
+                    <div className="aspect-video relative overflow-hidden rounded-lg border">
                       <Image
                         src={url}
                         alt={`${car.title} - Resim ${index + 1}`}
@@ -137,8 +137,8 @@ export default function ListingDetailPage({ params }: PageProps) {
             </CarouselContent>
              {car.imageUrls && car.imageUrls.length > 1 && (
                 <>
-                    <CarouselPrevious className="absolute left-2 text-white opacity-50 hover:opacity-100" />
-                    <CarouselNext className="absolute right-2 text-white opacity-50 hover:opacity-100" />
+                    <CarouselPrevious className="absolute left-2 text-white opacity-50 hover:opacity-100 bg-black/30 hover:bg-black/50 border-none" />
+                    <CarouselNext className="absolute right-2 text-white opacity-50 hover:opacity-100 bg-black/30 hover:bg-black/50 border-none" />
                 </>
              )}
           </Carousel>
@@ -177,8 +177,8 @@ export default function ListingDetailPage({ params }: PageProps) {
       </div>
 
       {/* Description & Expertise */}
-      <div className="mt-10 grid md:grid-cols-5 gap-8 lg:gap-12">
-        <div className="md:col-span-3">
+      <div className="mt-10 grid md:grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-12">
+        <div className="lg:col-span-3">
              {car.description && (
                 <Card>
                     <CardHeader>
@@ -191,7 +191,7 @@ export default function ListingDetailPage({ params }: PageProps) {
             )}
         </div>
 
-        <div className="md:col-span-2">
+        <div className="lg:col-span-2">
              <Card>
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
