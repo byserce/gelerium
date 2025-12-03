@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth, useUser, useFirestore, useCollection, useMemoFirebase } from '@/firebase';
-import { collection, doc, deleteDoc } from 'firebase/firestore';
+import { useAuth, useUser, useFirestore, useCollection, useMemoFirebase, deleteDocumentNonBlocking } from '@/firebase';
+import { collection, doc } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
 import { PlusCircle, Edit, Trash2, LogOut } from 'lucide-react';
 import CarForm from '@/components/admin/car-form';
@@ -19,7 +19,6 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
-import { deleteDocumentNonBlocking } from '@/firebase';
 
 function AdminDashboard() {
   const { user, isUserLoading } = useUser();
@@ -57,7 +56,7 @@ function AdminDashboard() {
   };
 
   const handleDeleteConfirm = () => {
-    if (!deletingCar) return;
+    if (!deletingCar || !firestore) return;
     const carDocRef = doc(firestore, 'cars', deletingCar.id);
     deleteDocumentNonBlocking(carDocRef);
     toast({ title: 'İlan silindi!', description: `${deletingCar.title} başarıyla silindi.` });

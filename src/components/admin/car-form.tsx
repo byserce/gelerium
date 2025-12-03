@@ -85,7 +85,7 @@ export default function CarForm({ isOpen, setIsOpen, car }: CarFormProps) {
     }
   }, [car, form, isOpen]);
 
-  const onSubmit = async (data: CarFormValues) => {
+  const onSubmit = (data: CarFormValues) => {
     const carData = {
         ...data,
         imageUrls: data.imageUrls.split(',').map(url => url.trim()).filter(url => url),
@@ -94,11 +94,11 @@ export default function CarForm({ isOpen, setIsOpen, car }: CarFormProps) {
     try {
       if (car) {
         // Update existing car
-        await updateCar(car.id, carData);
+        updateCar(car.id, carData);
         toast({ title: 'İlan güncellendi!', description: `${data.title} başarıyla güncellendi.` });
       } else {
         // Add new car
-        await addCar(carData);
+        addCar(carData);
         toast({ title: 'İlan eklendi!', description: `${data.title} başarıyla eklendi.` });
       }
       setIsOpen(false);
