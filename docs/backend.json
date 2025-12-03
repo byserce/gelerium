@@ -28,7 +28,14 @@
         },
         "imageUrls": {
           "type": "array",
-          "description": "URLs of the images for the car.",
+          "description": "Public URLs of the images for the car, stored in Firebase Storage.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "imagePaths": {
+          "type": "array",
+          "description": "Paths to the images in Firebase Storage. Used for management (e.g., deletion).",
           "items": {
             "type": "string"
           }
@@ -40,14 +47,6 @@
         "model": {
           "type": "string",
           "description": "The model of the car."
-        },
-        "listingUrl": {
-          "type": "string",
-          "description": "URL of the original listing on the source website (optional)."
-        },
-        "sahibindenId": {
-          "type": "string",
-          "description": "The ID of the listing on sahibinden.com (optional)."
         }
       },
       "required": [
@@ -57,6 +56,7 @@
         "year",
         "km",
         "imageUrls",
+        "imagePaths",
         "brand",
         "model"
       ]

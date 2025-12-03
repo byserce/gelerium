@@ -1,12 +1,11 @@
 'use client';
 
-import React, { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import React, 'react';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import {
   Form,
   FormControl,
@@ -27,6 +26,11 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import type { Car } from '@/lib/types';
 import { addCar, updateCar } from '@/lib/crud';
+import { UploadCloud, X, Image as ImageIcon } from 'lucide-react';
+import Image from 'next/image';
+
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/avif'];
 
 const carSchema = z.object({
   title: z.string().min(5, { message: 'Başlık en az 5 karakter olmalıdır.' }),
@@ -35,7 +39,11 @@ const carSchema = z.object({
   year: z.coerce.number().int().min(1900, 'Geçerli bir yıl girin.'),
   price: z.coerce.number().int().min(0, 'Fiyat negatif olamaz.'),
   km: z.coerce.number().int().min(0, 'Kilometre negatif olamaz.'),
-  imageUrls: z.string().min(1, {message: "En az 1 resim URL'si ekleyin."}),
+  images: z.any()
+    .refine((files: FileList | null) => files !== null && files.length > 0, 'En az bir resim yüklemelisiniz.')
+    .refine((files: FileList | null) => Array.from(files ?? []).every(file => file.size <= MAX_FILE_SIZE), `Dosya boyutu 5MB'ı geçemez.`)
+    .refine((files: FileList | null) => Array.from(files ?? []).every(file => ACCEPTED_IMAGE_TYPES.includes(file.type)), 'Sadece .jpg, .jpeg, .png, .webp ve .avif formatları desteklenmektedir.'),
+  existingImageUrls: z.array(z.string()).optional(),
 });
 
 type CarFormValues = z.infer<typeof carSchema>;
@@ -49,7 +57,7 @@ interface CarFormProps {
 export default function CarForm({ isOpen, setIsOpen, car }: CarFormProps) {
   const { toast } = useToast();
   const form = useForm<CarFormValues>({
-    resolver: zodResolver(carSchema),
+    resolver: zodResolver(car), // Updated schema will be applied dynamically
     defaultValues: {
       title: '',
       brand: '',
@@ -57,16 +65,37 @@ export default function CarForm({ isOpen, setIsOpen, car }: CarFormProps) {
       year: new Date().getFullYear(),
       price: 0,
       km: 0,
-      imageUrls: '',
+      images: undefined,
+      existingImageUrls: [],
     },
   });
 
-  useEffect(() => {
+  const { watch, setValue, control } = form;
+  const selectedFiles = watch('images');
+  const existingImages = watch('existingImageUrls');
+
+  React.useEffect(() => {
+    // Dynamically adjust schema based on whether we are editing or creating
+    const currentSchema = car
+      ? carSchema.extend({ images: carSchema.shape.images.optional() })
+      : carSchema;
+      
+    form.trigger(); // re-validate
+  }, [car, form]);
+
+
+  React.useEffect(() => {
     if (isOpen) {
       if (car) {
         form.reset({
-          ...car,
-          imageUrls: car.imageUrls.join(', '),
+          title: car.title,
+          brand: car.brand,
+          model: car.model,
+          year: car.year,
+          price: car.price,
+          km: car.km,
+          images: undefined, // Reset file input
+          existingImageUrls: car.imageUrls || [],
         });
       } else {
         form.reset({
@@ -76,26 +105,28 @@ export default function CarForm({ isOpen, setIsOpen, car }: CarFormProps) {
           year: new Date().getFullYear(),
           price: 0,
           km: 0,
-          imageUrls: '',
+          images: undefined,
+          existingImageUrls: [],
         });
       }
     }
   }, [car, form, isOpen]);
 
-  const onSubmit = (data: CarFormValues) => {
-    const carData = {
-        ...data,
-        imageUrls: data.imageUrls.split(',').map(url => url.trim()).filter(url => url),
-    };
-
+  const onSubmit = async (data: CarFormValues) => {
+    form.clearErrors(); // Clear previous errors
+    
     try {
       if (car) {
         // Update existing car
-        updateCar(car.id, carData);
+        await updateCar(car.id, data, data.images);
         toast({ title: 'İlan güncellendi!', description: `${data.title} başarıyla güncellendi.` });
       } else {
         // Add new car
-        addCar(carData);
+        if (!data.images) {
+            form.setError("images", { message: "Lütfen resim ekleyin."})
+            return;
+        }
+        await addCar(data, data.images);
         toast({ title: 'İlan eklendi!', description: `${data.title} başarıyla eklendi.` });
       }
       setIsOpen(false);
@@ -104,6 +135,10 @@ export default function CarForm({ isOpen, setIsOpen, car }: CarFormProps) {
        toast({ variant: 'destructive', title: 'Bir hata oluştu!', description: 'İlan kaydedilemedi.' });
     }
   };
+  
+  const removeExistingImage = (url: string) => {
+    setValue('existingImageUrls', (existingImages || []).filter(i => i !== url), { shouldValidate: true });
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -111,61 +146,109 @@ export default function CarForm({ isOpen, setIsOpen, car }: CarFormProps) {
         <DialogHeader>
           <DialogTitle>{car ? 'İlanı Düzenle' : 'Yeni İlan Ekle'}</DialogTitle>
           <DialogDescription>
-            Galerinize ait bir aracı vitrine ekleyin. Resim alanına, resimlerin internet adreslerini virgülle ayırarak girin.
+            Galerinize ait bir aracı vitrine ekleyin. Bilgisayarınızdan resim seçerek yükleyebilirsiniz.
           </DialogDescription>
         </DialogHeader>
         <div className="flex-grow overflow-y-auto pr-6 -mr-6">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4">
-              <FormField control={form.control} name="title" render={({ field }) => (
+              <FormField control={control} name="title" render={({ field }) => (
                 <FormItem className="md:col-span-2">
                   <FormLabel>İlan Başlığı</FormLabel>
                   <FormControl><Input placeholder="örn: Sahibinden temiz aile arabası" {...field} /></FormControl>
                   <FormMessage />
                 </FormItem>
               )} />
-              <FormField control={form.control} name="brand" render={({ field }) => (
+              <FormField control={control} name="brand" render={({ field }) => (
                 <FormItem>
                   <FormLabel>Marka</FormLabel>
                   <FormControl><Input placeholder="örn: Volkswagen" {...field} /></FormControl>
                   <FormMessage />
                 </FormItem>
               )} />
-              <FormField control={form.control} name="model" render={({ field }) => (
+              <FormField control={control} name="model" render={({ field }) => (
                 <FormItem>
                   <FormLabel>Model</FormLabel>
                   <FormControl><Input placeholder="örn: Passat" {...field} /></FormControl>
                   <FormMessage />
                 </FormItem>
               )} />
-              <FormField control={form.control} name="year" render={({ field }) => (
+              <FormField control={control} name="year" render={({ field }) => (
                 <FormItem>
                   <FormLabel>Yıl</FormLabel>
                   <FormControl><Input type="number" placeholder="2023" {...field} /></FormControl>
                   <FormMessage />
                 </FormItem>
               )} />
-              <FormField control={form.control} name="price" render={({ field }) => (
+              <FormField control={control} name="price" render={({ field }) => (
                 <FormItem>
                   <FormLabel>Fiyat (₺)</FormLabel>
                   <FormControl><Input type="number" placeholder="1.500.000" {...field} /></FormControl>
                   <FormMessage />
                 </FormItem>
               )} />
-               <FormField control={form.control} name="km" render={({ field }) => (
+               <FormField control={control} name="km" render={({ field }) => (
                 <FormItem>
                   <FormLabel>Kilometre</FormLabel>
                   <FormControl><Input type="number" placeholder="50.000" {...field} /></FormControl>
                   <FormMessage />
                 </FormItem>
               )} />
-              <FormField control={form.control} name="imageUrls" render={({ field }) => (
-                <FormItem className="md:col-span-2">
-                  <FormLabel>Resim URL'leri (Virgülle ayırın)</FormLabel>
-                  <FormControl><Textarea placeholder="https://site.com/resim1.jpg, https://site.com/resim2.jpg" {...field} /></FormControl>
-                  <FormMessage />
-                </FormItem>
-              )} />
+              <FormField
+                control={control}
+                name="images"
+                render={({ field: { onChange, value, ...rest } }) => (
+                  <FormItem className="md:col-span-2">
+                    <FormLabel>Resimler</FormLabel>
+                    <FormControl>
+                        <div className="relative flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-card hover:bg-muted/50">
+                            <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                                <UploadCloud className="w-8 h-8 mb-2 text-gray-500" />
+                                <p className="mb-2 text-sm text-gray-500"><span className="font-semibold">Yüklemek için tıklayın</span> veya sürükleyip bırakın</p>
+                                <p className="text-xs text-gray-500">PNG, JPG, WEBP, AVIF (MAX. 5MB)</p>
+                            </div>
+                            <Input 
+                                {...rest}
+                                type="file" 
+                                multiple
+                                className="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer"
+                                accept={ACCEPTED_IMAGE_TYPES.join(',')}
+                                onChange={(e) => onChange(e.target.files)}
+                            />
+                        </div>
+                    </FormControl>
+                    <FormMessage />
+                     {car && existingImages && existingImages.length > 0 && (
+                        <div className='space-y-2'>
+                            <p className='text-sm font-medium text-muted-foreground'>Mevcut Resimler</p>
+                             <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
+                                {existingImages.map(url => (
+                                    <div key={url} className="relative group aspect-square">
+                                        <Image src={url} alt="Mevcut resim" layout="fill" className="object-cover rounded-md" />
+                                        <button type="button" onClick={() => removeExistingImage(url)} className="absolute top-1 right-1 bg-red-600 text-white rounded-full p-0.5 opacity-75 group-hover:opacity-100 transition-opacity">
+                                            <X className="h-3 w-3" />
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                    {selectedFiles && selectedFiles.length > 0 && (
+                        <div className='space-y-2'>
+                             <p className='text-sm font-medium text-muted-foreground'>Yeni Seçilen Resimler</p>
+                            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
+                                {Array.from(selectedFiles).map((file, index) => (
+                                    <div key={index} className="relative group aspect-square">
+                                        <Image src={URL.createObjectURL(file)} alt={`Preview ${index}`} layout="fill" className="object-cover rounded-md" />
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                  </FormItem>
+                )}
+              />
+
               <DialogFooter className="md:col-span-2 mt-4 pt-4 border-t sticky bottom-0 bg-background">
                 <DialogClose asChild>
                   <Button type="button" variant="secondary">İptal</Button>

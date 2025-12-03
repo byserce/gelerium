@@ -5,9 +5,7 @@ export interface Car {
   year: number;
   km: number;
   imageUrls: string[];
+  imagePaths: string[];
   brand: string;
   model: string;
-  // The following are optional as they only apply to listings from an external source
-  sahibindenId?: string;
-  listingUrl?: string;
 }
