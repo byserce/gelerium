@@ -1,0 +1,99 @@
+{
+  "entities": {
+    "Car": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Car",
+      "type": "object",
+      "description": "Represents a car listing in the Avşarlı Digital Showroom application.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the car listing."
+        },
+        "title": {
+          "type": "string",
+          "description": "The title of the car listing."
+        },
+        "price": {
+          "type": "number",
+          "description": "The price of the car."
+        },
+        "year": {
+          "type": "number",
+          "description": "The manufacturing year of the car."
+        },
+        "km": {
+          "type": "number",
+          "description": "The kilometers the car has traveled."
+        },
+        "imageUrls": {
+          "type": "array",
+          "description": "URLs of the images for the car.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "listingUrl": {
+          "type": "string",
+          "description": "URL of the original listing on the source website."
+        },
+        "sahibindenId": {
+          "type": "string",
+          "description": "The ID of the listing on sahibinden.com."
+        },
+        "brand": {
+          "type": "string",
+          "description": "The brand of the car."
+        },
+        "model": {
+          "type": "string",
+          "description": "The model of the car."
+        },
+        "isActive": {
+          "type": "boolean",
+          "description": "Indicates whether the listing is currently active."
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "price",
+        "year",
+        "km",
+        "imageUrls",
+        "listingUrl",
+        "sahibindenId",
+        "brand",
+        "model",
+        "isActive"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "cars/{carId}",
+        "definition": {
+          "entityName": "Car",
+          "schema": {
+            "$ref": "#/backend/entities/Car"
+          },
+          "description": "Stores car listing data. Includes fields like title, price, year, km, imageUrls, listingUrl, and sahibindenId. The Cloud Function manages all writes/updates/deletes.",
+          "params": [
+            {
+              "name": "carId",
+              "description": "Unique identifier for each car listing, derived from the sahibindenId."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore structure is designed to store car listings scraped from Avşarlı Otomotiv's website. The primary collection is `cars`. Since there's no user-specific data or collaboration, a single `cars` collection is sufficient. Authorization independence is achieved because there are no complex access control requirements beyond the Cloud Function's ability to add/update/delete listings. This is controlled server-side. There is no user access, and therefore no requirement to denormalize auth data.\n\nThe QAPs are supported by:\n\n1.  **Simple Queries:** The `cars` collection allows for direct queries based on car attributes (brand, model, year, price) for filtering. No complex joins or subqueries are needed.\n2.  **No List Restrictions:** Since all data in the `cars` collection has the same access requirements (managed by the scraping Cloud Function), there are no restrictions on listing all documents. Rules-are-not-filters is not a concern because there are no role-based limitations on listing."
+  }
+}
