@@ -247,6 +247,7 @@ export default function CarForm({ car, onSuccess, onCancel }: CarFormProps) {
                                 <SelectContent>
                                     <SelectItem value="Orijinal">Orijinal</SelectItem>
                                     <SelectItem value="Boyalı">Boyalı</SelectItem>
+                                    <SelectItem value="Lokal Boyalı">Lokal Boyalı</SelectItem>
                                     <SelectItem value="Değişen">Değişen</SelectItem>
                                 </SelectContent>
                             </Select>

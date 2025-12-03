@@ -28,7 +28,7 @@ const partIdMap: Record<string, string> = {
 const statusColors: Record<string, string> = {
     'Boyalı': 'fill-yellow-400',
     'Değişen': 'fill-red-500',
-    'Lokal Boyalı': 'fill-yellow-200', // İstersen ekleyebilirsin
+    'Lokal Boyalı': 'fill-yellow-200',
     'Orijinal': 'fill-gray-100'
 };
 
@@ -171,6 +171,10 @@ export default function ExpertiseVisualizer({ report }: ExpertiseVisualizerProps
                     <span className="text-xs font-medium text-gray-600">Boyalı</span>
                 </div>
                 <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 rounded-full bg-yellow-200 border border-yellow-400 shadow-sm"></div>
+                    <span className="text-xs font-medium text-gray-600">Lokal Boyalı</span>
+                </div>
+                <div className="flex items-center gap-2">
                     <div className="w-4 h-4 rounded-full bg-red-500 border border-red-600 shadow-sm"></div>
                     <span className="text-xs font-medium text-gray-600">Değişen</span>
                 </div>
@@ -187,6 +191,7 @@ export default function ExpertiseVisualizer({ report }: ExpertiseVisualizerProps
                                 <span className={cn(
                                     "w-2 h-2 rounded-full",
                                     status === 'Boyalı' && 'bg-yellow-400',
+                                    status === 'Lokal Boyalı' && 'bg-yellow-200',
                                     status === 'Değişen' && 'bg-red-500'
                                 )} />
                             </div>
