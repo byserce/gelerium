@@ -38,86 +38,85 @@ async function uploadImages(files: File[]) {
 
 
 // Adds a new car to the 'listings' table
-export async function addCar(data: any, images: File[]) {
-    let newImageUrls: string[] = [];
-    let newImagePaths: string[] = [];
+export async function addCar(carData: any, images: File[]) {
+    const { imageUrls, imagePaths } = await uploadImages(images);
 
-    // Upload new images if they exist
-    if (images && images.length > 0) {
-        const { imageUrls, imagePaths } = await uploadImages(images);
-        newImageUrls = imageUrls;
-        newImagePaths = imagePaths;
-    }
-
-    // Prepare data for insertion
-    const carData = {
-        title: data.title,
-        brand: data.brand,
-        model: data.model,
-        year: Number(data.year),
-        price: Number(data.price),
-        kilometer: Number(data.km),
-        image_urls: newImageUrls,
-    };
-
-    const { error } = await supabase.from('listings').insert([carData]);
+    const { data, error } = await supabase
+        .from('listings')
+        .insert([
+            {
+                title: carData.title,
+                brand: carData.brand,
+                model: carData.model,
+                year: Number(carData.year),
+                price: Number(carData.price),
+                kilometer: Number(carData.km),
+                image_urls: imageUrls,
+                image_paths: imagePaths,
+                description: carData.description,
+                expertise_report: carData.expertise_report,
+            }
+        ]);
 
     if (error) {
-        console.error('Supabase insert error:', error);
+        console.error('Supabase insert error:', JSON.stringify(error, null, 2));
         throw new Error(`İlan kaydedilemedi: ${error.message}`);
     }
 }
 
 
 // Updates an existing car in the 'listings' table
-export async function updateCar(data: any, imagesToRemove: string[], existingPaths: string[]) {
+export async function updateCar(carData: any, newImages: File[], imagesToRemove: string[]) {
     let newImageUrls: string[] = [];
     let newImagePaths: string[] = [];
 
     // 1. Upload new images if any
-    if (data.images && data.images.length > 0) {
-        const { imageUrls, imagePaths } = await uploadImages(Array.from(data.images));
+    if (newImages && newImages.length > 0) {
+        const { imageUrls, imagePaths } = await uploadImages(newImages);
         newImageUrls = imageUrls;
         newImagePaths = imagePaths;
     }
 
     // 2. Remove images from storage if marked for deletion
     if (imagesToRemove.length > 0) {
-         const pathsToRemove = existingPaths.filter(path => {
-            const publicURL = supabase.storage.from('vehicle-images').getPublicUrl(path).data.publicUrl;
-            return imagesToRemove.includes(publicURL);
-        });
-
-        if (pathsToRemove.length > 0) {
-            const { error: storageError } = await supabase.storage.from('vehicle-images').remove(pathsToRemove);
-            if (storageError) {
-                console.error("Error removing images from storage:", storageError);
-            }
+        const { error: storageError } = await supabase.storage.from('vehicle-images').remove(imagesToRemove);
+        if (storageError) {
+            // Log error but don't block the update
+            console.error("Error removing images from storage:", storageError);
         }
     }
     
-    const finalImageUrls = [...(data.existingImageUrls || []), ...newImageUrls];
+    // Combine old and new image URLs and paths
+    const finalImageUrls = [...(carData.existingImageUrls || []), ...newImageUrls];
+    const finalImagePaths = [
+        ...(carData.existingImagePaths?.filter((path: string) => !imagesToRemove.includes(path)) || []),
+        ...newImagePaths
+    ];
 
-    const carData = {
-        title: data.title,
-        brand: data.brand,
-        model: data.model,
-        year: Number(data.year),
-        price: Number(data.price),
-        kilometer: Number(data.km),
+    const dataToUpdate = {
+        title: carData.title,
+        brand: carData.brand,
+        model: carData.model,
+        year: Number(carData.year),
+        price: Number(carData.price),
+        kilometer: Number(carData.km),
         image_urls: finalImageUrls,
+        image_paths: finalImagePaths,
+        description: carData.description,
+        expertise_report: carData.expertise_report,
     };
 
     const { error } = await supabase
         .from('listings')
-        .update(carData)
-        .eq('id', data.id);
+        .update(dataToUpdate)
+        .eq('id', carData.id);
 
     if (error) {
-        console.error('Supabase update error:', error);
+        console.error('Supabase update error:', JSON.stringify(error, null, 2));
         throw new Error(`İlan güncellenemedi: ${error.message}`);
     }
 }
+
 
 // Deletes a document from a specified table
 export async function deleteDoc(table: string, id: string) {

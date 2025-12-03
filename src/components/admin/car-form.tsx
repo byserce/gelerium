@@ -1,20 +1,27 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm, Controller, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { UploadCloud, X } from 'lucide-react';
 import NextImage from 'next/image';
 import type { Car } from '@/lib/types';
 import { addCar, updateCar } from '@/lib/crud';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 
 const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
 const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/avif'];
+
+const expertisePartSchema = z.object({
+  part: z.string(),
+  status: z.string(),
+});
 
 const baseSchema = z.object({
   title: z.string().min(10, 'Başlık en az 10 karakter olmalıdır.'),
@@ -23,6 +30,8 @@ const baseSchema = z.object({
   year: z.coerce.number().int().min(1900, 'Geçerli bir yıl girin.').max(new Date().getFullYear() + 1),
   price: z.coerce.number().min(0, 'Fiyat 0\'dan büyük olmalıdır.'),
   km: z.coerce.number().int().min(0, 'Kilometre negatif olamaz.'),
+  description: z.string().optional(),
+  expertise_report: z.array(expertisePartSchema).optional(),
   existingImageUrls: z.array(z.string()).optional(),
   existingImagePaths: z.array(z.string()).optional(),
 });
@@ -58,6 +67,13 @@ interface CarFormProps {
   onCancel: () => void;
 }
 
+const carParts = [
+    'Kaput', 'Tavan', 'Bagaj', 
+    'Sağ Ön Çamurluk', 'Sağ Ön Kapı', 'Sağ Arka Kapı', 'Sağ Arka Çamurluk',
+    'Sol Ön Çamurluk', 'Sol Ön Kapı', 'Sol Arka Kapı', 'Sol Arka Çamurluk',
+    'Ön Tampon', 'Arka Tampon'
+];
+
 export default function CarForm({ car, onSuccess, onCancel }: CarFormProps) {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -69,22 +85,39 @@ export default function CarForm({ car, onSuccess, onCancel }: CarFormProps) {
 
   const isEditMode = !!car;
 
+  const defaultExpertise = carParts.map(part => ({
+      part,
+      status: car?.expertise_report?.[part] || 'Orijinal'
+  }));
+
   const { register, handleSubmit, formState: { errors }, watch, setValue, control, reset } = useForm<CarFormValues>({
     resolver: zodResolver(isEditMode ? updateCarSchema : createCarSchema),
     defaultValues: car ? {
       ...car,
+      km: car.km || 0,
+      price: car.price || 0,
+      year: car.year || new Date().getFullYear(),
+      description: car.description || '',
+      expertise_report: defaultExpertise,
       existingImageUrls: car.imageUrls || [],
       existingImagePaths: car.imagePaths || [],
     } : {
       title: '',
       brand: '',
       model: '',
-      year: 0,
+      year: new Date().getFullYear(),
       price: 0,
       km: 0,
+      description: '',
+      expertise_report: carParts.map(part => ({ part, status: 'Orijinal' })),
       existingImageUrls: [],
       existingImagePaths: [],
     },
+  });
+
+  const { fields } = useFieldArray({
+    control,
+    name: "expertise_report"
   });
   
   const newImageFiles = watch('images');
@@ -105,10 +138,15 @@ export default function CarForm({ car, onSuccess, onCancel }: CarFormProps) {
   const onSubmit: SubmitHandler<CarFormValues> = async (data) => {
     setIsSubmitting(true);
     try {
-      const finalData = { ...data, id: car?.id };
+        const expertiseObject = data.expertise_report?.reduce((acc, item) => {
+            acc[item.part] = item.status;
+            return acc;
+        }, {} as Record<string, string>);
+
+      const finalData = { ...data, id: car?.id, expertise_report: expertiseObject };
       
       if (isEditMode) {
-        await updateCar(finalData, imagesToRemove, car?.imagePaths || []);
+        await updateCar(finalData, data.images ? Array.from(data.images) : [], imagesToRemove);
       } else {
         if (!finalData.images || finalData.images.length === 0) {
            throw new Error("Yeni ilanlar için en az bir resim gereklidir.");
@@ -136,7 +174,10 @@ export default function CarForm({ car, onSuccess, onCancel }: CarFormProps) {
   };
 
   const removeExistingImage = (urlToRemove: string) => {
-    setImagesToRemove(prev => [...prev, urlToRemove]);
+    const imagePathToRemove = existingImages.find(img => img.url === urlToRemove)?.path;
+    if(imagePathToRemove) {
+      setImagesToRemove(prev => [...prev, imagePathToRemove]);
+    }
     setExistingImages(prev => prev.filter(({url}) => url !== urlToRemove));
     const currentExistingUrls = watch('existingImageUrls') || [];
     setValue('existingImageUrls', currentExistingUrls.filter(url => url !== urlToRemove), { shouldValidate: true });
@@ -188,6 +229,38 @@ export default function CarForm({ car, onSuccess, onCancel }: CarFormProps) {
           <Label htmlFor="kilometer">Kilometre</Label>
           <Input id="kilometer" type="number" {...register('km')} placeholder="50.000" />
           {errors.km && <p className="text-sm text-red-500">{errors.km.message}</p>}
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="description">Açıklama</Label>
+        <Textarea id="description" {...register('description')} placeholder="Aracın durumu, özellikleri, ek bilgiler..." rows={4} />
+      </div>
+
+      <div className="space-y-2">
+        <Label>Ekspertiz Raporu</Label>
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-3 rounded-md border p-4">
+            {fields.map((field, index) => (
+                <div key={field.id} className="grid grid-cols-2 items-center gap-2">
+                     <Label htmlFor={`expertise_report.${index}.status`} className="text-sm text-muted-foreground">{field.part}</Label>
+                     <Controller
+                        control={control}
+                        name={`expertise_report.${index}.status`}
+                        render={({ field }) => (
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <SelectTrigger id={`expertise_report.${index}.status`}>
+                                    <SelectValue placeholder="Durum" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="Orijinal">Orijinal</SelectItem>
+                                    <SelectItem value="Boyalı">Boyalı</SelectItem>
+                                    <SelectItem value="Değişen">Değişen</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        )}
+                    />
+                </div>
+            ))}
         </div>
       </div>
       
