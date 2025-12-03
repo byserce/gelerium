@@ -22,6 +22,7 @@ import {
   DialogTitle,
   DialogFooter,
   DialogClose,
+  DialogDescription,
 } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import type { Car } from '@/lib/types';
@@ -35,8 +36,6 @@ const carSchema = z.object({
   price: z.coerce.number().int().min(0, 'Fiyat negatif olamaz.'),
   km: z.coerce.number().int().min(0, 'Kilometre negatif olamaz.'),
   imageUrls: z.string().min(1, {message: "En az 1 resim URL'si ekleyin."}),
-  listingUrl: z.string().url({ message: 'Geçerli bir URL girin.' }).optional().or(z.literal('')),
-  sahibindenId: z.string().optional(),
 });
 
 type CarFormValues = z.infer<typeof carSchema>;
@@ -59,29 +58,27 @@ export default function CarForm({ isOpen, setIsOpen, car }: CarFormProps) {
       price: 0,
       km: 0,
       imageUrls: '',
-      listingUrl: '',
-      sahibindenId: '',
     },
   });
 
   useEffect(() => {
-    if (car) {
-      form.reset({
-        ...car,
-        imageUrls: car.imageUrls.join(', '),
-      });
-    } else {
-      form.reset({
-        title: '',
-        brand: '',
-        model: '',
-        year: new Date().getFullYear(),
-        price: 0,
-        km: 0,
-        imageUrls: '',
-        listingUrl: '',
-        sahibindenId: '',
-      });
+    if (isOpen) {
+      if (car) {
+        form.reset({
+          ...car,
+          imageUrls: car.imageUrls.join(', '),
+        });
+      } else {
+        form.reset({
+          title: '',
+          brand: '',
+          model: '',
+          year: new Date().getFullYear(),
+          price: 0,
+          km: 0,
+          imageUrls: '',
+        });
+      }
     }
   }, [car, form, isOpen]);
 
@@ -113,13 +110,16 @@ export default function CarForm({ isOpen, setIsOpen, car }: CarFormProps) {
       <DialogContent className="sm:max-w-[625px] max-h-[90dvh] flex flex-col">
         <DialogHeader>
           <DialogTitle>{car ? 'İlanı Düzenle' : 'Yeni İlan Ekle'}</DialogTitle>
+          <DialogDescription>
+            Galerinize ait bir aracı vitrine ekleyin. Resim alanına, resimlerin internet adreslerini virgülle ayırarak girin.
+          </DialogDescription>
         </DialogHeader>
         <div className="flex-grow overflow-y-auto pr-6 -mr-6">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4">
               <FormField control={form.control} name="title" render={({ field }) => (
                 <FormItem className="md:col-span-2">
-                  <FormLabel>Başlık</FormLabel>
+                  <FormLabel>İlan Başlığı</FormLabel>
                   <FormControl><Input placeholder="örn: Sahibinden temiz aile arabası" {...field} /></FormControl>
                   <FormMessage />
                 </FormItem>
@@ -159,24 +159,10 @@ export default function CarForm({ isOpen, setIsOpen, car }: CarFormProps) {
                   <FormMessage />
                 </FormItem>
               )} />
-              <FormField control={form.control} name="sahibindenId" render={({ field }) => (
-                  <FormItem>
-                      <FormLabel>Sahibinden ID (Opsiyonel)</FormLabel>
-                      <FormControl><Input placeholder="123456789" {...field} /></FormControl>
-                      <FormMessage />
-                  </FormItem>
-              )} />
               <FormField control={form.control} name="imageUrls" render={({ field }) => (
                 <FormItem className="md:col-span-2">
                   <FormLabel>Resim URL'leri (Virgülle ayırın)</FormLabel>
                   <FormControl><Textarea placeholder="https://site.com/resim1.jpg, https://site.com/resim2.jpg" {...field} /></FormControl>
-                  <FormMessage />
-                </FormItem>
-              )} />
-              <FormField control={form.control} name="listingUrl" render={({ field }) => (
-                <FormItem className="md:col-span-2">
-                  <FormLabel>İlan Linki (Opsiyonel)</FormLabel>
-                  <FormControl><Input placeholder="https://www.sahibinden.com/ilan/..." {...field} /></FormControl>
                   <FormMessage />
                 </FormItem>
               )} />

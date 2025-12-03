@@ -8,7 +8,7 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier for the car listing."
+          "description": "Unique identifier for the car listing, managed by Firestore."
         },
         "title": {
           "type": "string",
@@ -33,14 +33,6 @@
             "type": "string"
           }
         },
-        "listingUrl": {
-          "type": "string",
-          "description": "URL of the original listing on the source website."
-        },
-        "sahibindenId": {
-          "type": "string",
-          "description": "The ID of the listing on sahibinden.com."
-        },
         "brand": {
           "type": "string",
           "description": "The brand of the car."
@@ -48,6 +40,14 @@
         "model": {
           "type": "string",
           "description": "The model of the car."
+        },
+        "listingUrl": {
+          "type": "string",
+          "description": "URL of the original listing on the source website (optional)."
+        },
+        "sahibindenId": {
+          "type": "string",
+          "description": "The ID of the listing on sahibinden.com (optional)."
         }
       },
       "required": [
@@ -73,7 +73,7 @@
       "schema": {
         "$ref": "#/entities/Car"
       },
-      "description": "Stores car listing data. Includes fields like title, price, year, km, imageUrls, listingUrl, and sahibindenId. The Cloud Function manages all writes/updates/deletes."
+      "description": "Stores car listing data. Can be written by authenticated admins and read by public."
     }
   }
 }

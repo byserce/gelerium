@@ -1,7 +1,6 @@
 'use client';
 
-import { collection, doc, addDoc, updateDoc } from 'firebase/firestore';
-import { getFirestore } from 'firebase/firestore';
+import { collection, doc } from 'firebase/firestore';
 import { initializeFirebase, addDocumentNonBlocking, updateDocumentNonBlocking } from '@/firebase';
 import type { Car } from './types';
 
@@ -9,7 +8,7 @@ import type { Car } from './types';
 const { firestore } = initializeFirebase();
 const carsCollection = collection(firestore, 'cars');
 
-type CarInput = Omit<Car, 'id'>;
+type CarInput = Omit<Car, 'id' | 'sahibindenId' | 'listingUrl'>;
 
 export const addCar = (carData: CarInput) => {
   addDocumentNonBlocking(carsCollection, carData);
