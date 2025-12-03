@@ -27,7 +27,7 @@ const baseSchema = z.object({
 });
 
 const imageSchema = z.any()
-  .refine((files: FileList | null | undefined) => files === undefined || files === null || files.length > 0, {
+  .refine((files: FileList | null | undefined) => !files || files.length > 0, {
     message: 'En az bir resim yüklemelisiniz.',
   })
   .refine((files: FileList | null) => Array.from(files ?? []).every(file => file.size <= MAX_FILE_SIZE), `Dosya boyutu 50MB'ı geçemez.`)
@@ -41,7 +41,16 @@ const createCarSchema = baseSchema.extend({
 
 const updateCarSchema = baseSchema.extend({
   images: imageSchema.optional(),
+}).superRefine((data, ctx) => {
+    if (data.images?.length === 0 && (!data.existingImageUrls || data.existingImageUrls.length === 0)) {
+         ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['images'],
+            message: 'En az bir resim gereklidir.',
+        });
+    }
 });
+
 
 type CarFormValues = z.infer<typeof baseSchema & { images?: FileList | null, id?: string }>;
 
@@ -62,10 +71,18 @@ export default function CarForm({ car, onSuccess, onCancel }: CarFormProps) {
 
   const { register, handleSubmit, formState: { errors }, watch, setValue, control, reset } = useForm<CarFormValues>({
     resolver: zodResolver(isEditMode ? updateCarSchema : createCarSchema),
-    defaultValues: {
+    defaultValues: car ? {
       ...car,
-      existingImageUrls: car?.imageUrls || [],
-    } || {},
+      existingImageUrls: car.imageUrls || [],
+    } : {
+      title: '',
+      brand: '',
+      model: '',
+      year: new Date().getFullYear(),
+      price: 0,
+      km: 0,
+      existingImageUrls: [],
+    },
   });
   
   const newImageFiles = watch('images');
@@ -164,7 +181,7 @@ export default function CarForm({ car, onSuccess, onCancel }: CarFormProps) {
         </div>
         <div className="space-y-2">
           <Label htmlFor="kilometer">Kilometre</Label>
-          <Input id="kilometer" type="number" {...register('kilometer')} placeholder="50.000" />
+          <Input id="kilometer" type="number" {...register('km')} placeholder="50.000" />
           {errors.km && <p className="text-sm text-red-500">{errors.km.message}</p>}
         </div>
       </div>
@@ -238,3 +255,5 @@ export default function CarForm({ car, onSuccess, onCancel }: CarFormProps) {
     </form>
   );
 }
+
+    
