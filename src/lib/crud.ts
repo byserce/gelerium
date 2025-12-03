@@ -33,10 +33,12 @@ export const addCar = async (carData: CarFormData, files: FileList) => {
     imageUrls,
     imagePaths,
   };
-  // Remove the temporary fields before updating the document
+  // Remove the temporary fields before submitting
   delete (newCarData as any).images;
-  // Use addDoc for auto-generated ID
-  return addDoc(carsCollection, newCarData);
+  delete (newCarData as any).existingImageUrls;
+
+  // Await the database operation
+  await addDoc(carsCollection, newCarData);
 };
 
 export const updateCar = async (carId: string, carData: CarFormData & { existingImageUrls?: string[] }, newFiles?: FileList) => {
@@ -79,5 +81,6 @@ export const updateCar = async (carId: string, carData: CarFormData & { existing
   delete (updatedCarData as any).existingImageUrls;
   delete (updatedCarData as any).images;
 
-  return updateDoc(carDocRef, updatedCarData);
+  // Await the database operation
+  await updateDoc(carDocRef, updatedCarData as any);
 };
