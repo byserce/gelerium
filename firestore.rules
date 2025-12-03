@@ -1,52 +1,18 @@
-/**
- * Core Philosophy: This ruleset enforces a strict "Public Read, Backend-Only Write" security model.
- * The primary goal is to make all car listing data publicly readable by any user,
- * while completely disallowing any modifications (create, update, delete) from client applications.
- * This ensures that the data's integrity is maintained, as all mutations are expected to be handled
- * exclusively by a trusted server-side process (e.g., a Cloud Function) using the Admin SDK,
- * which bypasses these rules.
- *
- * Data Structure: The data is organized in a single top-level collection `cars`, where each document
- * represents a specific car listing. There are no user-specific subcollections or complex relationships,
- * simplifying the rules significantly.
- *
- * Key Security Decisions:
- * - Public Read Access: All documents in the `/cars` collection are publicly accessible for both
- *   individual reads (`get`) and collection queries (`list`). This supports the application's
- *   purpose as a public digital showroom.
- * - Universal Write Denial: All client-side write operations (`create`, `update`, `delete`) are
- *   explicitly denied (`if false;`). This is the cornerstone of the security model, preventing any
- *   unauthorized data tampering.
- * - No User Authentication Required: The rules do not depend on user authentication (`request.auth`),
- *   as the access controls are uniform for all users, whether anonymous or signed-in.
- *
- * Denormalization for Authorization: Not applicable. Since there are no user-specific permissions
- * or ownership models, there is no need to denormalize user data for authorization checks.
- *
- * Structural Segregation: Not applicable. All data within the `cars` collection shares the same
- * public, read-only access level, so there is no need to segregate public and private data
- * into separate collections.
- */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-
-    /**
-     * @description Provides public read-only access to car listings. All write operations are disabled to ensure data is only managed by the trusted backend service (Cloud Function).
-     * @path        /cars/{carId}
-     * @allow       Any user (anonymous or signed-in) can read a specific car document or list all cars: `(get, list)`
-     * @deny        Any user attempting to create, update, or delete a car listing from the client: `(create, update, delete)`
-     * @principle   Ensures data integrity by making the collection read-only from the client-side. All mutations must be performed by a privileged backend process.
-     */
     match /cars/{carId} {
-      // Public Read: Anyone can view car listings.
-      allow get: if true;
-      allow list: if true;
+      // Allow public read access to all car listings.
+      allow read: if true;
 
-      // No Client Writes: All modifications are handled by the backend.
-      allow create: if false;
-      allow update: if false;
-      allow delete: if false;
+      // Allow write access only for authenticated users.
+      // This is a basic rule; in a real app, you'd likely restrict this to admins.
+      allow write: if request.auth != null;
+    }
+
+    // You might have a users collection to store roles
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
     }
   }
 }

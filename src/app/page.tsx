@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useMemo } from 'react';
-import { cars as allCars } from '@/lib/data';
 import type { Car } from '@/lib/types';
 import CarCard from '@/components/car-card';
 import FilterControls from '@/components/filter-controls';
@@ -9,6 +8,9 @@ import { Button } from '@/components/ui/button';
 import DealershipMap from '@/components/map';
 import { Car as CarIcon, MapPin, Phone, ShieldCheck, SlidersHorizontal } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
+import { collection } from 'firebase/firestore';
+import { Skeleton } from '@/components/ui/skeleton';
 
 type Filters = {
   brand: string;
@@ -19,6 +21,10 @@ type Filters = {
 };
 
 export default function Home() {
+  const firestore = useFirestore();
+  const carsCollection = useMemoFirebase(() => collection(firestore, 'cars'), [firestore]);
+  const { data: allCars, isLoading } = useCollection<Omit<Car, 'id'>>(carsCollection);
+  
   const [filters, setFilters] = useState<Filters>({
     brand: 'all',
     model: 'all',
@@ -29,7 +35,8 @@ export default function Home() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   const filteredCars = useMemo(() => {
-    return allCars.filter((car: Car) => {
+    if (!allCars) return [];
+    return allCars.filter((car) => {
       const { brand, model, year, minPrice, maxPrice } = filters;
       return (
         (brand === 'all' || car.brand === brand) &&
@@ -39,7 +46,7 @@ export default function Home() {
         car.price <= maxPrice
       );
     });
-  }, [filters]);
+  }, [filters, allCars]);
 
   return (
     <>
@@ -58,24 +65,37 @@ export default function Home() {
               </Button>
             </CollapsibleTrigger>
              <div className="hidden md:block">
-              <FilterControls cars={allCars} filters={filters} setFilters={setFilters} />
+              <FilterControls cars={allCars || []} filters={filters} setFilters={setFilters} />
              </div>
             <CollapsibleContent>
                <div className="md:hidden">
-                 <FilterControls cars={allCars} filters={filters} setFilters={setFilters} />
+                 <FilterControls cars={allCars || []} filters={filters} setFilters={setFilters} />
                </div>
             </CollapsibleContent>
           </Collapsible>
 
+          {isLoading && (
+             <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-8">
+                {[...Array(4)].map((_, i) => (
+                  <div key={i} className="flex flex-col space-y-3">
+                    <Skeleton className="h-[192px] w-full rounded-xl" />
+                    <div className="space-y-2">
+                      <Skeleton className="h-4 w-full" />
+                      <Skeleton className="h-4 w-[200px]" />
+                    </div>
+                  </div>
+                ))}
+            </div>
+          )}
 
-          {filteredCars.length > 0 ? (
+          {!isLoading && filteredCars.length > 0 ? (
             <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-8">
               {filteredCars.map((car) => (
                 <CarCard key={car.id} car={car} />
               ))}
             </div>
           ) : (
-            <div className="text-center mt-16 py-16 bg-muted rounded-lg">
+            !isLoading && <div className="text-center mt-16 py-16 bg-muted rounded-lg">
               <p className="text-xl text-muted-foreground">Aradığınız kriterlere uygun araç bulunamadı.</p>
             </div>
           )}
