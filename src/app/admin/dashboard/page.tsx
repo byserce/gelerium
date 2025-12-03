@@ -57,7 +57,6 @@ export default function AdminDashboard() {
           price: item.price,
           km: item.kilometer,
           imageUrls: item.image_urls || [],
-          imagePaths: item.image_paths || [],
           description: item.description,
           expertise_report: item.expertise_report,
         }));
@@ -84,16 +83,26 @@ export default function AdminDashboard() {
     if (!car.id) return;
     try {
       // Delete associated images from storage first
-      if (car.imagePaths && car.imagePaths.length > 0) {
-        const { error: storageError } = await supabase.storage.from('vehicle-images').remove(car.imagePaths);
-        if (storageError) {
-          // Log the error but proceed to delete the DB record
-          console.error('Error deleting images from storage:', storageError);
-           toast({
-            variant: 'destructive',
-            title: 'Depolama Hatası',
-            description: `İlan resimleri silinemedi, ancak ilan veritabanından silinecektir: ${storageError.message}`,
-          });
+      if (car.imageUrls && car.imageUrls.length > 0) {
+         const pathsToRemove = car.imageUrls.map(url => {
+            const urlParts = url.split('/');
+            // Assumes the path is the last part after the 'public' segment in the bucket
+            const publicIndex = urlParts.indexOf('public');
+            if (publicIndex === -1 || publicIndex + 1 >= urlParts.length) return '';
+            return urlParts.slice(publicIndex + 1).join('/');
+        }).filter(Boolean); // Filter out any empty strings from failed parsing
+
+        if (pathsToRemove.length > 0) {
+            const { error: storageError } = await supabase.storage.from('vehicle-images').remove(pathsToRemove);
+            if (storageError) {
+              // Log the error but proceed to delete the DB record
+              console.error('Error deleting images from storage:', storageError);
+               toast({
+                variant: 'destructive',
+                title: 'Depolama Hatası',
+                description: `İlan resimleri silinemedi, ancak ilan veritabanından silinecektir: ${storageError.message}`,
+              });
+            }
         }
       }
 

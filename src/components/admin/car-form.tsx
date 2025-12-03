@@ -33,7 +33,6 @@ const baseSchema = z.object({
   description: z.string().optional(),
   expertise_report: z.array(expertisePartSchema).optional(),
   existingImageUrls: z.array(z.string()).optional(),
-  existingImagePaths: z.array(z.string()).optional(),
 });
 
 const imageSchema = z.any()
@@ -77,9 +76,7 @@ const carParts = [
 export default function CarForm({ car, onSuccess, onCancel }: CarFormProps) {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [existingImages, setExistingImages] = useState<{ url: string, path: string }[]>(
-    car?.imageUrls?.map((url, i) => ({ url, path: car.imagePaths[i] || '' })) || []
-  );
+  const [existingImages, setExistingImages] = useState<string[]>(car?.imageUrls || []);
   const [imagesToRemove, setImagesToRemove] = useState<string[]>([]);
   const [newImagePreviews, setNewImagePreviews] = useState<string[]>([]);
 
@@ -100,7 +97,6 @@ export default function CarForm({ car, onSuccess, onCancel }: CarFormProps) {
       description: car.description || '',
       expertise_report: defaultExpertise,
       existingImageUrls: car.imageUrls || [],
-      existingImagePaths: car.imagePaths || [],
     } : {
       title: '',
       brand: '',
@@ -111,7 +107,6 @@ export default function CarForm({ car, onSuccess, onCancel }: CarFormProps) {
       description: '',
       expertise_report: carParts.map(part => ({ part, status: 'Orijinal' })),
       existingImageUrls: [],
-      existingImagePaths: [],
     },
   });
 
@@ -148,10 +143,11 @@ export default function CarForm({ car, onSuccess, onCancel }: CarFormProps) {
       if (isEditMode) {
         await updateCar(finalData, data.images ? Array.from(data.images) : [], imagesToRemove);
       } else {
-        if (!finalData.images || finalData.images.length === 0) {
+        const imageFiles = data.images ? Array.from(data.images) : [];
+        if (imageFiles.length === 0) {
            throw new Error("Yeni ilanlar için en az bir resim gereklidir.");
         }
-        await addCar(finalData, Array.from(finalData.images));
+        await addCar(finalData, imageFiles);
       }
 
       toast({
@@ -174,11 +170,8 @@ export default function CarForm({ car, onSuccess, onCancel }: CarFormProps) {
   };
 
   const removeExistingImage = (urlToRemove: string) => {
-    const imagePathToRemove = existingImages.find(img => img.url === urlToRemove)?.path;
-    if(imagePathToRemove) {
-      setImagesToRemove(prev => [...prev, imagePathToRemove]);
-    }
-    setExistingImages(prev => prev.filter(({url}) => url !== urlToRemove));
+    setImagesToRemove(prev => [...prev, urlToRemove]);
+    setExistingImages(prev => prev.filter((url) => url !== urlToRemove));
     const currentExistingUrls = watch('existingImageUrls') || [];
     setValue('existingImageUrls', currentExistingUrls.filter(url => url !== urlToRemove), { shouldValidate: true });
   };
@@ -268,7 +261,7 @@ export default function CarForm({ car, onSuccess, onCancel }: CarFormProps) {
          <div className="space-y-2">
            <Label>Mevcut Resimler</Label>
            <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-             {existingImages.map(({url}) => (
+             {existingImages.map((url) => (
                <div key={url} className="relative group aspect-square">
                  <NextImage src={url} alt={`Mevcut resim`} fill className="object-cover rounded-md" />
                  <button type="button" onClick={() => removeExistingImage(url)} className="absolute top-1 right-1 bg-red-600 text-white rounded-full p-0.5 opacity-75 group-hover:opacity-100 transition-opacity">

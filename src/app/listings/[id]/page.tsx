@@ -53,7 +53,6 @@ export default function ListingDetailPage({ params }: PageProps) {
             price: data.price,
             km: data.kilometer,
             imageUrls: data.image_urls || [],
-            imagePaths: data.image_paths || [],
             description: data.description,
             expertise_report: data.expertise_report,
         };

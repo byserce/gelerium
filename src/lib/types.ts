@@ -7,7 +7,6 @@ export type Car = {
   price: number;
   km: number;
   imageUrls: string[];
-  imagePaths: string[]; // Store storage paths for deletion
   description?: string;
   expertise_report?: Record<string, string>;
 };

@@ -41,7 +41,6 @@ export default function HomePage() {
         console.error('Error fetching cars:', error);
         setCars([]);
       } else if (data) {
-        // Supabase'den gelen veriyi Car tipine uygun hale getiriyoruz.
         const formattedData: Car[] = data.map((item: any) => ({
           id: item.id,
           title: item.title,
@@ -49,9 +48,8 @@ export default function HomePage() {
           model: item.model,
           year: item.year,
           price: item.price,
-          km: item.kilometer, // Sütun adı 'kilometer'
+          km: item.kilometer,
           imageUrls: item.image_urls || [],
-          imagePaths: item.image_paths || [],
         }));
         setCars(formattedData);
       }
