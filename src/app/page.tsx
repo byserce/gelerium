@@ -46,11 +46,11 @@ export default function Home() {
 
   return (
     <>
-      <section id="listings" className="py-16 lg:py-24 bg-card">
+      <section id="listings" className="py-8 lg:py-12 bg-card">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-8">
-            <h2 className="text-2xl md:text-3xl font-headline font-bold text-primary">Vitrin İlanları</h2>
-            <p className="mt-2 text-md md:text-lg text-muted-foreground">Size özel seçtiğimiz araçları inceleyin.</p>
+            <h2 className="text-xl md:text-2xl font-headline font-bold text-primary">Vitrin İlanları</h2>
+            <p className="mt-2 text-sm md:text-base text-muted-foreground">Size özel seçtiğimiz araçları inceleyin.</p>
           </div>
           
           <Collapsible open={isFilterOpen} onOpenChange={setIsFilterOpen} className="mb-8">
