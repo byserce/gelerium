@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth, useUser, useFirestore, useCollection, useMemoFirebase, deleteDocumentNonBlocking } from '@/firebase';
-import { collection, doc } from 'firebase/firestore';
+import { useAuth, useUser, useFirestore, useCollection, useMemoFirebase } from '@/firebase';
+import { collection, doc, deleteDoc } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
 import { PlusCircle, Edit, Trash2, LogOut } from 'lucide-react';
 import CarForm from '@/components/admin/car-form';
@@ -55,12 +55,19 @@ function AdminDashboard() {
     setIsFormOpen(true);
   };
 
-  const handleDeleteConfirm = () => {
+  const handleDeleteConfirm = async () => {
     if (!deletingCar || !firestore) return;
-    const carDocRef = doc(firestore, 'cars', deletingCar.id);
-    deleteDocumentNonBlocking(carDocRef);
-    toast({ title: 'İlan silindi!', description: `${deletingCar.title} başarıyla silindi.` });
-    setDeletingCar(null);
+    try {
+      const carDocRef = doc(firestore, 'cars', deletingCar.id);
+      await deleteDoc(carDocRef);
+      // Optionally, delete images from storage here if needed.
+      toast({ title: 'İlan silindi!', description: `${deletingCar.title} başarıyla silindi.` });
+    } catch (error) {
+      console.error("Error deleting document: ", error);
+      toast({ variant: 'destructive', title: 'Hata!', description: 'İlan silinirken bir sorun oluştu.' });
+    } finally {
+      setDeletingCar(null);
+    }
   };
 
   if (isUserLoading || !user) {
