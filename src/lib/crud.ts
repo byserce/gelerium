@@ -52,7 +52,7 @@ export async function addCar(carData: any, images: File[]) {
                 price: Number(carData.price),
                 kilometer: Number(carData.km),
                 image_urls: imageUrls,
-                image_paths: imagePaths,
+                image_paths: imagePaths, // Add paths to the database
                 description: carData.description,
                 expertise_report: carData.expertise_report,
             }
@@ -101,7 +101,7 @@ export async function updateCar(carData: any, newImages: File[], imagesToRemove:
         price: Number(carData.price),
         kilometer: Number(carData.km),
         image_urls: finalImageUrls,
-        image_paths: finalImagePaths,
+        image_paths: finalImagePaths, // Update paths in the database
         description: carData.description,
         expertise_report: carData.expertise_report,
     };

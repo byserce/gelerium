@@ -58,6 +58,8 @@ export default function AdminDashboard() {
           km: item.kilometer,
           imageUrls: item.image_urls || [],
           imagePaths: item.image_paths || [],
+          description: item.description,
+          expertise_report: item.expertise_report,
         }));
       setCars(formattedData);
     }
