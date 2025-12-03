@@ -1,7 +1,8 @@
 import Link from 'next/link';
-import { Car, Menu } from 'lucide-react';
+import { Car, Menu, LogIn } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from '../ui/sheet';
+import { Separator } from '../ui/separator';
 
 export default function Header() {
     return (
@@ -37,34 +38,41 @@ export default function Header() {
                                 <span className="sr-only">Menüyü aç</span>
                             </Button>
                         </SheetTrigger>
-                        <SheetContent side="right">
-                            <div className="flex flex-col h-full">
-                                <div className="p-6">
-                                    <Link href="/" className="flex items-center gap-3 group">
-                                        <Car className="h-8 w-8 text-primary" />
-                                        <span className="text-xl font-headline font-bold text-foreground">
-                                            Avşarlı Otomotiv
-                                        </span>
+                        <SheetContent side="right" className="flex flex-col">
+                            <div className="p-6 border-b">
+                                <Link href="/" className="flex items-center gap-3 group">
+                                    <Car className="h-8 w-8 text-primary" />
+                                    <span className="text-xl font-headline font-bold text-foreground">
+                                        Avşarlı Otomotiv
+                                    </span>
+                                </Link>
+                            </div>
+                            <nav className="flex flex-col gap-1 p-4 text-lg font-medium flex-1">
+                                <SheetClose asChild>
+                                    <Link href="#listings" className="px-2 py-3 rounded-md hover:bg-muted">İlanlar</Link>
+                                </SheetClose>
+                                <SheetClose asChild>
+                                    <Link href="#about" className="px-2 py-3 rounded-md hover:bg-muted">Hakkımızda</Link>
+                                </SheetClose>
+                                <SheetClose asChild>
+                                    <Link href="#contact" className="px-2 py-3 rounded-md hover:bg-muted">İletişim</Link>
+                                </SheetClose>
+                                
+                                <Separator className="my-2" />
+
+                                <SheetClose asChild>
+                                    <Link href="/admin/login" className="flex items-center gap-3 px-2 py-3 rounded-md text-muted-foreground hover:bg-muted hover:text-foreground">
+                                        <LogIn className="h-5 w-5" />
+                                        <span>Giriş Yap</span>
                                     </Link>
-                                </div>
-                                <nav className="flex flex-col gap-4 p-6 text-lg font-medium flex-1">
-                                    <SheetClose asChild>
-                                        <Link href="#listings" className="py-2">İlanlar</Link>
-                                    </SheetClose>
-                                    <SheetClose asChild>
-                                        <Link href="#about" className="py-2">Hakkımızda</Link>
-                                    </SheetClose>
-                                    <SheetClose asChild>
-                                        <Link href="#contact" className="py-2">İletişim</Link>
-                                    </SheetClose>
-                                </nav>
-                                <div className="p-6 mt-auto">
-                                    <a href="tel:+905542140263" className="w-full">
-                                        <Button size="lg" className="w-full bg-primary text-primary-foreground">
-                                            Hemen Ara
-                                        </Button>
-                                    </a>
-                                </div>
+                                </SheetClose>
+                            </nav>
+                            <div className="p-4 mt-auto border-t">
+                                <a href="tel:+905542140263" className="w-full">
+                                    <Button size="lg" className="w-full bg-primary text-primary-foreground">
+                                        Hemen Ara
+                                    </Button>
+                                </a>
                             </div>
                         </SheetContent>
                     </Sheet>
