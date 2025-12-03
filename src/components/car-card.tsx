@@ -28,22 +28,22 @@ export default function CarCard({ car }: CarCardProps) {
                   <Image
                     src={url}
                     alt={`${car.title} - Resim ${index + 1}`}
-                    width={800}
-                    height={600}
-                    className="object-cover w-full h-48"
+                    width={400}
+                    height={300}
+                    className="object-cover w-full h-36 md:h-48"
                     data-ai-hint="car exterior"
                   />
                 </div>
               </CarouselItem>
             ))}
           </CarouselContent>
-          <CarouselPrevious className="absolute left-2" />
-          <CarouselNext className="absolute right-2" />
+          <CarouselPrevious className="absolute left-2 text-white opacity-50 hover:opacity-100" />
+          <CarouselNext className="absolute right-2 text-white opacity-50 hover:opacity-100" />
         </Carousel>
       </CardHeader>
-      <CardContent className="flex-grow p-4 space-y-3">
-        <h3 className="font-headline text-lg font-bold h-12 text-foreground leading-tight">{car.title}</h3>
-        <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm text-muted-foreground">
+      <CardContent className="flex-grow p-3 space-y-2">
+        <h3 className="font-headline text-base font-bold h-10 text-foreground leading-tight">{car.title}</h3>
+        <div className="flex flex-col gap-1 text-xs text-muted-foreground">
           <div className="flex items-center gap-1.5" title="Model Yılı">
             <Calendar className="h-4 w-4 text-accent" />
             <span>{car.year}</span>
@@ -53,13 +53,13 @@ export default function CarCard({ car }: CarCardProps) {
             <span>{car.km.toLocaleString('tr-TR')} km</span>
           </div>
         </div>
-        <p className="text-2xl font-bold text-primary flex items-center gap-2">
-            <Tag className="h-6 w-6" />
+        <p className="text-xl font-bold text-primary flex items-center gap-2 pt-1">
+            <Tag className="h-5 w-5" />
             {formattedPrice}
         </p>
       </CardContent>
-      <CardFooter className="p-4 bg-muted/50">
-        <Button asChild className="w-full bg-primary hover:bg-accent text-primary-foreground hover:text-accent-foreground">
+      <CardFooter className="p-3 bg-muted/50">
+        <Button asChild size="sm" className="w-full bg-primary hover:bg-accent text-primary-foreground hover:text-accent-foreground text-xs">
           <Link href={car.listingUrl} target="_blank" rel="noopener noreferrer">
             Sahibinden.com'da Gör
           </Link>
@@ -68,3 +68,5 @@ export default function CarCard({ car }: CarCardProps) {
     </Card>
   );
 }
+
+    

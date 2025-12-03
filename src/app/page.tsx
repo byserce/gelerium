@@ -10,7 +10,8 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import DealershipMap from '@/components/map';
 import { placeholderImages } from '@/lib/placeholder-images.json';
-import { Car as CarIcon, MapPin, Phone, ShieldCheck } from 'lucide-react';
+import { Car as CarIcon, MapPin, Phone, ShieldCheck, SlidersHorizontal } from 'lucide-react';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 type Filters = {
   brand: string;
@@ -28,6 +29,7 @@ export default function Home() {
     minPrice: 0,
     maxPrice: 10000000,
   });
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   const filteredCars = useMemo(() => {
     return allCars.filter((car: Car) => {
@@ -46,13 +48,31 @@ export default function Home() {
     <>
       <section id="listings" className="py-16 lg:py-24 bg-card">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
+          <div className="text-center mb-8">
             <h2 className="text-3xl md:text-4xl font-headline font-bold text-primary">Vitrin İlanları</h2>
             <p className="mt-2 text-lg text-muted-foreground">Size özel seçtiğimiz araçları inceleyin.</p>
           </div>
-          <FilterControls cars={allCars} filters={filters} setFilters={setFilters} />
+          
+          <Collapsible open={isFilterOpen} onOpenChange={setIsFilterOpen} className="mb-8">
+            <CollapsibleTrigger asChild>
+              <Button variant="outline" className="w-full md:hidden mb-4">
+                <SlidersHorizontal className="mr-2 h-4 w-4" />
+                Filtrele
+              </Button>
+            </CollapsibleTrigger>
+             <div className="hidden md:block">
+              <FilterControls cars={allCars} filters={filters} setFilters={setFilters} />
+             </div>
+            <CollapsibleContent>
+               <div className="md:hidden">
+                 <FilterControls cars={allCars} filters={filters} setFilters={setFilters} />
+               </div>
+            </CollapsibleContent>
+          </Collapsible>
+
+
           {filteredCars.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 mt-8">
+            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-8">
               {filteredCars.map((car) => (
                 <CarCard key={car.id} car={car} />
               ))}
@@ -139,3 +159,5 @@ export default function Home() {
     </>
   );
 }
+
+    

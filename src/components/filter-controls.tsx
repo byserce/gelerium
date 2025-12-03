@@ -57,7 +57,7 @@ export default function FilterControls({ cars, filters, setFilters }: FilterCont
   };
 
   return (
-    <div className="p-6 bg-card rounded-lg shadow-md border mb-8">
+    <div className="p-4 md:p-6 bg-card rounded-lg shadow-md border">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4 items-end">
         <div>
           <Label htmlFor="brand">Marka</Label>
@@ -149,3 +149,5 @@ export default function FilterControls({ cars, filters, setFilters }: FilterCont
     </div>
   );
 }
+
+    
