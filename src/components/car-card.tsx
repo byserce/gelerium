@@ -42,7 +42,7 @@ export default function CarCard({ car }: CarCardProps) {
         </Carousel>
       </CardHeader>
       <CardContent className="flex-grow p-3 space-y-2">
-        <h3 className="font-headline text-base font-bold h-10 text-foreground leading-tight">{car.title}</h3>
+        <h3 className="font-headline text-base font-bold h-12 text-foreground leading-tight">{car.title}</h3>
         <div className="flex flex-col gap-1 text-xs text-muted-foreground">
           <div className="flex items-center gap-1.5" title="Model Yılı">
             <Calendar className="h-4 w-4 text-accent" />
@@ -68,5 +68,3 @@ export default function CarCard({ car }: CarCardProps) {
     </Card>
   );
 }
-
-    
