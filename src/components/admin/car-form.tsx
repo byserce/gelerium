@@ -110,85 +110,87 @@ export default function CarForm({ isOpen, setIsOpen, car }: CarFormProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="sm:max-w-[625px]">
+      <DialogContent className="sm:max-w-[625px] max-h-[90dvh] flex flex-col">
         <DialogHeader>
           <DialogTitle>{car ? 'İlanı Düzenle' : 'Yeni İlan Ekle'}</DialogTitle>
         </DialogHeader>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4">
-            <FormField control={form.control} name="title" render={({ field }) => (
-              <FormItem className="md:col-span-2">
-                <FormLabel>Başlık</FormLabel>
-                <FormControl><Input placeholder="örn: Sahibinden temiz aile arabası" {...field} /></FormControl>
-                <FormMessage />
-              </FormItem>
-            )} />
-            <FormField control={form.control} name="brand" render={({ field }) => (
-              <FormItem>
-                <FormLabel>Marka</FormLabel>
-                <FormControl><Input placeholder="örn: Volkswagen" {...field} /></FormControl>
-                <FormMessage />
-              </FormItem>
-            )} />
-            <FormField control={form.control} name="model" render={({ field }) => (
-              <FormItem>
-                <FormLabel>Model</FormLabel>
-                <FormControl><Input placeholder="örn: Passat" {...field} /></FormControl>
-                <FormMessage />
-              </FormItem>
-            )} />
-            <FormField control={form.control} name="year" render={({ field }) => (
-              <FormItem>
-                <FormLabel>Yıl</FormLabel>
-                <FormControl><Input type="number" placeholder="2023" {...field} /></FormControl>
-                <FormMessage />
-              </FormItem>
-            )} />
-            <FormField control={form.control} name="price" render={({ field }) => (
-              <FormItem>
-                <FormLabel>Fiyat (₺)</FormLabel>
-                <FormControl><Input type="number" placeholder="1.500.000" {...field} /></FormControl>
-                <FormMessage />
-              </FormItem>
-            )} />
-             <FormField control={form.control} name="km" render={({ field }) => (
-              <FormItem>
-                <FormLabel>Kilometre</FormLabel>
-                <FormControl><Input type="number" placeholder="50.000" {...field} /></FormControl>
-                <FormMessage />
-              </FormItem>
-            )} />
-            <FormField control={form.control} name="sahibindenId" render={({ field }) => (
-                <FormItem>
-                    <FormLabel>Sahibinden ID (Opsiyonel)</FormLabel>
-                    <FormControl><Input placeholder="123456789" {...field} /></FormControl>
-                    <FormMessage />
+        <div className="flex-grow overflow-y-auto pr-6 -mr-6">
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4">
+              <FormField control={form.control} name="title" render={({ field }) => (
+                <FormItem className="md:col-span-2">
+                  <FormLabel>Başlık</FormLabel>
+                  <FormControl><Input placeholder="örn: Sahibinden temiz aile arabası" {...field} /></FormControl>
+                  <FormMessage />
                 </FormItem>
-            )} />
-            <FormField control={form.control} name="imageUrls" render={({ field }) => (
-              <FormItem className="md:col-span-2">
-                <FormLabel>Resim URL'leri (Virgülle ayırın)</FormLabel>
-                <FormControl><Textarea placeholder="https://site.com/resim1.jpg, https://site.com/resim2.jpg" {...field} /></FormControl>
-                <FormMessage />
-              </FormItem>
-            )} />
-            <FormField control={form.control} name="listingUrl" render={({ field }) => (
-              <FormItem className="md:col-span-2">
-                <FormLabel>İlan Linki (Opsiyonel)</FormLabel>
-                <FormControl><Input placeholder="https://www.sahibinden.com/ilan/..." {...field} /></FormControl>
-                <FormMessage />
-              </FormItem>
-            )} />
-            <DialogFooter className="md:col-span-2 mt-4">
-              <DialogClose asChild>
-                <Button type="button" variant="secondary">İptal</Button>
-              </DialogClose>
-              <Button type="submit" disabled={form.formState.isSubmitting}>
-                {form.formState.isSubmitting ? 'Kaydediliyor...' : 'Kaydet'}
-              </Button>
-            </DialogFooter>
-          </form>
-        </Form>
+              )} />
+              <FormField control={form.control} name="brand" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Marka</FormLabel>
+                  <FormControl><Input placeholder="örn: Volkswagen" {...field} /></FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
+              <FormField control={form.control} name="model" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Model</FormLabel>
+                  <FormControl><Input placeholder="örn: Passat" {...field} /></FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
+              <FormField control={form.control} name="year" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Yıl</FormLabel>
+                  <FormControl><Input type="number" placeholder="2023" {...field} /></FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
+              <FormField control={form.control} name="price" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Fiyat (₺)</FormLabel>
+                  <FormControl><Input type="number" placeholder="1.500.000" {...field} /></FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
+               <FormField control={form.control} name="km" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Kilometre</FormLabel>
+                  <FormControl><Input type="number" placeholder="50.000" {...field} /></FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
+              <FormField control={form.control} name="sahibindenId" render={({ field }) => (
+                  <FormItem>
+                      <FormLabel>Sahibinden ID (Opsiyonel)</FormLabel>
+                      <FormControl><Input placeholder="123456789" {...field} /></FormControl>
+                      <FormMessage />
+                  </FormItem>
+              )} />
+              <FormField control={form.control} name="imageUrls" render={({ field }) => (
+                <FormItem className="md:col-span-2">
+                  <FormLabel>Resim URL'leri (Virgülle ayırın)</FormLabel>
+                  <FormControl><Textarea placeholder="https://site.com/resim1.jpg, https://site.com/resim2.jpg" {...field} /></FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
+              <FormField control={form.control} name="listingUrl" render={({ field }) => (
+                <FormItem className="md:col-span-2">
+                  <FormLabel>İlan Linki (Opsiyonel)</FormLabel>
+                  <FormControl><Input placeholder="https://www.sahibinden.com/ilan/..." {...field} /></FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
+              <DialogFooter className="md:col-span-2 mt-4 pt-4 border-t sticky bottom-0 bg-background">
+                <DialogClose asChild>
+                  <Button type="button" variant="secondary">İptal</Button>
+                </DialogClose>
+                <Button type="submit" disabled={form.formState.isSubmitting}>
+                  {form.formState.isSubmitting ? 'Kaydediliyor...' : 'Kaydet'}
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </div>
       </DialogContent>
     </Dialog>
   );
