@@ -24,16 +24,14 @@ const baseSchema = z.object({
   price: z.coerce.number().min(0, 'Fiyat 0\'dan büyük olmalıdır.'),
   km: z.coerce.number().int().min(0, 'Kilometre negatif olamaz.'),
   existingImageUrls: z.array(z.string()).optional(),
-  existingImagePaths: z.array(z.string()).optional(), // Add this to carry over paths
+  existingImagePaths: z.array(z.string()).optional(),
 });
 
 const imageSchema = z.any()
-  .refine((files: FileList | null | undefined): files is FileList => files !== null && files !== undefined, {
-    message: 'Resimler null veya undefined olamaz.',
-  })
-  .refine((files: FileList) => files.length > 0, 'En az bir resim yüklemelisiniz.')
-  .refine((files: FileList) => Array.from(files).every(file => file.size <= MAX_FILE_SIZE), `Dosya boyutu 50MB'ı geçemez.`)
-  .refine((files: FileList) => Array.from(files).every(file => ACCEPTED_IMAGE_TYPES.includes(file.type)), 'Sadece .jpg, .jpeg, .png, .webp ve .avif formatları desteklenmektedir.');
+    .refine((files): files is FileList => files instanceof FileList, 'Dosya listesi bekleniyor.')
+    .refine((files) => files.length > 0, 'En az bir resim yüklemelisiniz.')
+    .refine((files) => Array.from(files).every(file => file.size <= MAX_FILE_SIZE), `Dosya boyutu 50MB'ı geçemez.`)
+    .refine((files) => Array.from(files).every(file => ACCEPTED_IMAGE_TYPES.includes(file.type)), 'Sadece .jpg, .jpeg, .png, .webp ve .avif formatları desteklenmektedir.');
 
 const createCarSchema = baseSchema.extend({
   images: imageSchema,
@@ -63,9 +61,8 @@ interface CarFormProps {
 export default function CarForm({ car, onSuccess, onCancel }: CarFormProps) {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  // Separate states for existing images
   const [existingImages, setExistingImages] = useState<{ url: string, path: string }[]>(
-    car?.imageUrls?.map((url, i) => ({ url, path: car.imagePaths[i] })) || []
+    car?.imageUrls?.map((url, i) => ({ url, path: car.imagePaths[i] || '' })) || []
   );
   const [imagesToRemove, setImagesToRemove] = useState<string[]>([]);
   const [newImagePreviews, setNewImagePreviews] = useState<string[]>([]);
@@ -77,14 +74,14 @@ export default function CarForm({ car, onSuccess, onCancel }: CarFormProps) {
     defaultValues: car ? {
       ...car,
       existingImageUrls: car.imageUrls || [],
-      existingImagePaths: car.imagePaths || [], // Make sure paths are in default values
+      existingImagePaths: car.imagePaths || [],
     } : {
       title: '',
       brand: '',
       model: '',
-      year: new Date().getFullYear(),
-      price: undefined, // Use undefined for placeholder to show
-      km: undefined,    // Use undefined for placeholder to show
+      year: 0,
+      price: 0,
+      km: 0,
       existingImageUrls: [],
       existingImagePaths: [],
     },
@@ -116,7 +113,7 @@ export default function CarForm({ car, onSuccess, onCancel }: CarFormProps) {
         if (!finalData.images || finalData.images.length === 0) {
            throw new Error("Yeni ilanlar için en az bir resim gereklidir.");
         }
-        await addCar(finalData);
+        await addCar(finalData, Array.from(finalData.images));
       }
 
       toast({
