@@ -1,11 +1,10 @@
 import type { Car } from './types';
 
-// This file now represents the 'database' of cars.
-// The car-data-updater-flow will compare against this data.
+// This file simulates the data that would be returned by a web scraper.
+// In a real implementation, this data would be fetched live.
 
-export const cars: Car[] = [
+export const scrapedCars: Omit<Car, 'id'>[] = [
   {
-    id: '1',
     sahibindenId: '1168173481',
     title: '2017 VW PASSAT 1.6 TDI COMFORTLİNE DSG CAM TAVAN',
     price: 1385000,
@@ -21,7 +20,6 @@ export const cars: Car[] = [
     listingUrl: 'https://www.sahibinden.com/ilan/vasita-otomobil-volkswagen-2017-vw-passat-1.6-tdi-comfortline-dsg-cam-tavan-1168173481/detay',
   },
   {
-    id: '2',
     sahibindenId: '1166412497',
     title: '2023 SKODA SUPERB 1.5 TSI PRESTIGE DSG 18 JANT',
     price: 2100000,
@@ -37,7 +35,6 @@ export const cars: Car[] = [
     listingUrl: 'https://www.sahibinden.com/ilan/vasita-otomobil-skoda-2023-skoda-superb-1.5-tsi-prestige-dsg-18-jant-1166412497/detay',
   },
   {
-    id: '4',
     sahibindenId: '1165780287',
     title: '2022 MERCEDES C200 4 MATIC AMG',
     price: 2900000,
@@ -52,19 +49,19 @@ export const cars: Car[] = [
     ],
     listingUrl: 'https://www.sahibinden.com/ilan/vasita-otomobil-mercedes-benz-2022-mercedes-c200-4-matic-amg-1165780287/detay',
   },
+  // This listing has a slightly different price to test the AI consistency check
   {
-    id: '5',
     sahibindenId: '1150247659',
     title: '2023 PEUGEOT 3008 1.5 BLUEHDI ALLURE',
-    price: 1850000,
+    price: 1849000, // Price changed
     year: 2023,
-    km: 15000,
+    km: 15500, // KM changed
     brand: 'Peugeot',
     model: '3008',
     imageUrls: [
       "https://images.unsplash.com/photo-1684849311731-eb8293657d7e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHx3aGl0ZSUyMHN1dnxlbnwwfHx8fDE3NjQ2OTcyMDR8MA&ixlib=rb-4.1.0&q=80&w=1080",
-      "https://images.unsplash.com/photo-1575388902449-6bca946ad549?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxmdXR1cmlzdGljJTIwZGFzaGJvYXJkfGVufDB8fHx8MTc2NDc1MTI4Mnww&ixlib.rb-4.1.0&q=80&w=1080",
-      "https://images.unsplash.com/photo-1725745096249-f6e7c160c4be?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxjYXIlMjB0YWlsbGlnaHR8ZW58MHx8fHwxNzY0NzM2NzM4fDA&ixlib.rb-4.1.0&q=80&w=1080"
+      "https://images.unsplash.com/photo-1575388902449-6bca946ad549?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxmdXR1cmlzdGljJTIwZGFzaGJvYXJkfGVufDB8fHx8MTc2NDc1MTI4Mnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "https://images.unsplash.com/photo-1725745096249-f6e7c160c4be?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxjYXIlMjB0YWlsbGlnaHR8ZW58MHx8fHwxNzY0NzM2NzM4fDA&ixlib=rb-4.1.0&q=80&w=1080"
     ],
     listingUrl: 'https://www.sahibinden.com/ilan/vasita-otomobil-peugeot-2023-peugeot-3008-1.5-bluehdi-allure-1150247659/detay',
   },
