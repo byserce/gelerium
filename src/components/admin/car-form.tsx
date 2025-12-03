@@ -29,7 +29,7 @@ import { addCar, updateCar } from '@/lib/crud';
 import { UploadCloud, X, Image as ImageIcon } from 'lucide-react';
 import Image from 'next/image';
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
 const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/avif'];
 
 const carSchema = z.object({
@@ -41,7 +41,7 @@ const carSchema = z.object({
   km: z.coerce.number().int().min(0, 'Kilometre negatif olamaz.'),
   images: z.any()
     .refine((files: FileList | null) => files !== null && files.length > 0, 'En az bir resim yüklemelisiniz.')
-    .refine((files: FileList | null) => Array.from(files ?? []).every(file => file.size <= MAX_FILE_SIZE), `Dosya boyutu 5MB'ı geçemez.`)
+    .refine((files: FileList | null) => Array.from(files ?? []).every(file => file.size <= MAX_FILE_SIZE), `Dosya boyutu 50MB'ı geçemez.`)
     .refine((files: FileList | null) => Array.from(files ?? []).every(file => ACCEPTED_IMAGE_TYPES.includes(file.type)), 'Sadece .jpg, .jpeg, .png, .webp ve .avif formatları desteklenmektedir.'),
   existingImageUrls: z.array(z.string()).optional(),
 });
@@ -135,6 +135,16 @@ export default function CarForm({ isOpen, setIsOpen, car }: CarFormProps) {
     setValue('existingImageUrls', (existingImages || []).filter(i => i !== url), { shouldValidate: true });
   }
 
+  const removeNewImage = (fileToRemove: File) => {
+    const currentFiles = Array.from(watch('images') || []);
+    const newFiles = currentFiles.filter(file => file !== fileToRemove);
+    
+    const dataTransfer = new DataTransfer();
+    newFiles.forEach(file => dataTransfer.items.add(file));
+
+    setValue('images', dataTransfer.files, { shouldValidate: true });
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className="sm:max-w-[625px] max-h-[90dvh] flex flex-col">
@@ -200,7 +210,7 @@ export default function CarForm({ isOpen, setIsOpen, car }: CarFormProps) {
                             <div className="flex flex-col items-center justify-center pt-5 pb-6">
                                 <UploadCloud className="w-8 h-8 mb-2 text-gray-500" />
                                 <p className="mb-2 text-sm text-gray-500"><span className="font-semibold">Yüklemek için tıklayın</span> veya sürükleyip bırakın</p>
-                                <p className="text-xs text-gray-500">PNG, JPG, WEBP, AVIF (MAX. 5MB)</p>
+                                <p className="text-xs text-gray-500">PNG, JPG, WEBP, AVIF (MAX. 50MB)</p>
                             </div>
                             <Input 
                                 {...rest}
@@ -235,6 +245,9 @@ export default function CarForm({ isOpen, setIsOpen, car }: CarFormProps) {
                                 {Array.from(selectedFiles).map((file, index) => (
                                     <div key={index} className="relative group aspect-square">
                                         <Image src={URL.createObjectURL(file)} alt={`Preview ${index}`} fill className="object-cover rounded-md" />
+                                         <button type="button" onClick={() => removeNewImage(file)} className="absolute top-1 right-1 bg-red-600 text-white rounded-full p-0.5 opacity-75 group-hover:opacity-100 transition-opacity">
+                                            <X className="h-3 w-3" />
+                                        </button>
                                     </div>
                                 ))}
                             </div>
@@ -259,5 +272,3 @@ export default function CarForm({ isOpen, setIsOpen, car }: CarFormProps) {
     </Dialog>
   );
 }
-
-    
