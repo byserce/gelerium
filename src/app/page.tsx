@@ -1,15 +1,12 @@
 "use client";
 
 import React, { useState, useMemo } from 'react';
-import Image from 'next/image';
 import { cars as allCars } from '@/lib/data';
 import type { Car } from '@/lib/types';
 import CarCard from '@/components/car-card';
 import FilterControls from '@/components/filter-controls';
 import { Button } from '@/components/ui/button';
-import Link from 'next/link';
 import DealershipMap from '@/components/map';
-import { placeholderImages } from '@/lib/placeholder-images.json';
 import { Car as CarIcon, MapPin, Phone, ShieldCheck, SlidersHorizontal } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
@@ -91,12 +88,12 @@ export default function Home() {
             <h2 className="text-3xl md:text-4xl font-headline font-bold text-primary">Hakkımızda</h2>
             <p className="mt-2 text-lg text-muted-foreground">Yılların tecrübesi, sarsılmaz güven.</p>
           </div>
-          <div className="grid md:grid-cols-2 gap-12 items-center">
+          <div className="grid grid-cols-1 gap-12 items-center max-w-4xl mx-auto">
             <div className="space-y-6">
-              <p className="text-lg text-foreground/80">
+              <p className="text-lg text-center text-foreground/80">
                 Avşarlı Otomotiv olarak, sektördeki uzun yıllara dayanan tecrübemizle müşterilerimize en kaliteli hizmeti sunmayı hedefliyoruz. Geniş araç portföyümüz, uzman ekibimiz ve şeffaf satış politikamızla, araç alım satım sürecinizi kolay ve güvenli bir deneyime dönüştürüyoruz.
               </p>
-              <div className="space-y-4">
+              <div className="grid sm:grid-cols-2 gap-8 pt-6">
                 <div className="flex items-start gap-4">
                   <div className="flex-shrink-0 bg-primary text-primary-foreground rounded-full p-3">
                     <ShieldCheck className="h-6 w-6" />
@@ -116,16 +113,6 @@ export default function Home() {
                   </div>
                 </div>
               </div>
-            </div>
-            <div>
-              <Image 
-                src="https://picsum.photos/seed/showroom/800/600"
-                alt="Avşarlı Otomotiv Showroom"
-                width={800}
-                height={600}
-                className="rounded-lg shadow-xl"
-                data-ai-hint="car showroom"
-              />
             </div>
           </div>
         </div>
