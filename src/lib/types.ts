@@ -8,4 +8,5 @@ export interface Car {
   imagePaths: string[];
   brand: string;
   model: string;
+  listingUrl?: string;
 }
