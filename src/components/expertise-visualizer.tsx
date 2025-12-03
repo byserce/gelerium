@@ -1,15 +1,14 @@
-
 'use client';
 
 import { cn } from "@/lib/utils";
 
-// --- TİP VE MAP TANIMLARI (Aynen korundu) ---
 type ExpertiseReport = Record<string, string>;
 
 interface ExpertiseVisualizerProps {
     report: ExpertiseReport;
 }
 
+// Türkçe veritabanı keyleri ile kod içindeki ID eşleşmesi
 const partIdMap: Record<string, string> = {
     'Kaput': 'hood',
     'Tavan': 'roof',
@@ -29,176 +28,167 @@ const partIdMap: Record<string, string> = {
 const statusColors: Record<string, string> = {
     'Boyalı': 'fill-yellow-400',
     'Değişen': 'fill-red-500',
-    'Orijinal': 'fill-gray-100' // Orijinal rengi görseldeki gibi daha açık gri yaptım
+    'Lokal Boyalı': 'fill-yellow-200', // İstersen ekleyebilirsin
+    'Orijinal': 'fill-gray-100'
 };
 
-// --- ANA BİLEŞEN ---
 export default function ExpertiseVisualizer({ report }: ExpertiseVisualizerProps) {
+    
     const getPartColor = (partKey: string) => {
         if (!partKey) return statusColors['Orijinal'];
         const status = report[partKey] || 'Orijinal';
-        // Eğer statusColors içinde tanımlı olmayan bir durum gelirse gri döner
         return statusColors[status] || statusColors['Orijinal'];
     };
 
     const partKeys = Object.keys(partIdMap);
 
     return (
-        <div className="flex flex-col items-center w-full max-w-2xl mx-auto p-4">
-            {/* GÜNCELLENMİŞ DETAYLI SVG ŞEMASI 
-                Referans görseldeki geometriye sadık kalındı.
-                Arka kısım üstte, Ön kısım altta.
-            */}
-            <svg
-                width="100%"
-                height="auto"
-                viewBox="0 0 800 1050"
-                xmlns="http://www.w3.org/2000/svg"
-                className="max-w-full drop-shadow-sm"
-            >
-                {/* Çizgiler için ortak stil */}
-                <g stroke="#9ca3af" strokeWidth="3" strokeLinejoin="round">
+        <div className="flex flex-col items-center w-full">
+            {/* SVG Container */}
+            <div className="relative w-full max-w-[400px] aspect-[3/4]">
+                <svg
+                    viewBox="0 0 300 420"
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="w-full h-full drop-shadow-md"
+                    stroke="#374151" // Koyu gri çizgiler
+                    strokeWidth="1.5"
+                >
+                    {/* --- ORTA BLOK (Gövde) --- */}
+                    
+                    {/* Ön Tampon (Kavisli) */}
+                    <path
+                        d="M 85 20 Q 150 5 215 20 L 215 40 Q 150 30 85 40 Z"
+                        className={cn("transition-colors duration-300", getPartColor('Ön Tampon'))}
+                    />
 
-                    {/* --- ORTA BÖLÜM (Yukarıdan Aşağıya: Arka Tampon -> Bagaj -> Tavan -> Kaput -> Ön Tampon) --- */}
-                    <g id="center-column">
-                        {/* Arka Tampon */}
-                        <path
-                            id={partIdMap['Arka Tampon']}
-                            className={cn("transition-colors", getPartColor('Arka Tampon'))}
-                            d="M280,40 Q400,10 520,40 L520,70 Q400,100 280,70 Z"
-                        />
-                        {/* Bagaj */}
-                        <path
-                            id={partIdMap['Bagaj']}
-                            className={cn("transition-colors", getPartColor('Bagaj'))}
-                            d="M285,75 L515,75 C525,150 515,230 505,260 L295,260 C285,230 275,150 285,75 Z"
-                        />
-                        {/* Tavan */}
-                        <path
-                            id={partIdMap['Tavan']}
-                            className={cn("transition-colors", getPartColor('Tavan'))}
-                            d="M295,265 L505,265 L500,600 L300,600 Z"
-                        />
-                        {/* Kaput */}
-                        <path
-                            id={partIdMap['Kaput']}
-                            className={cn("transition-colors", getPartColor('Kaput'))}
-                            d="M300,605 L500,605 C490,750 480,820 470,860 L330,860 C320,820 310,750 300,605 Z"
-                        />
-                        {/* Ön Tampon */}
-                        <path
-                            id={partIdMap['Ön Tampon']}
-                            className={cn("transition-colors", getPartColor('Ön Tampon'))}
-                             d="M 325 865 Q 400 880 475 865 L 485 900 Q 400 930 315 900 Z"
-                        />
-                    </g>
+                    {/* Kaput (Aerodinamik çizgili) */}
+                    <path
+                        d="M 85 45 Q 150 35 215 45 L 210 120 Q 150 115 90 120 Z"
+                        className={cn("transition-colors duration-300", getPartColor('Kaput'))}
+                    />
 
+                    {/* Ön Cam (Cam olduğu için boyanmaz, sadece görsel - Açık mavi/gri) */}
+                    <path
+                        d="M 90 125 Q 150 120 210 125 L 205 150 Q 150 145 95 150 Z"
+                        className="fill-blue-50/50 stroke-gray-300"
+                    />
 
-                    {/* --- SOL TARAF (Sol Çamurluklar ve Kapılar) --- */}
-                    <g id="left-side" transform="translate(-10, 0)">
-                         {/* Etiketler */}
-                        <text x="80" y="500" className="text-xl fill-gray-500 font-semibold" transform="rotate(-90 80,500)">SOL</text>
-                        <text x="220" y="800" className="text-lg fill-gray-400">ÖN</text>
-                        <text x="220" y="200" className="text-lg fill-gray-400">ARKA</text>
+                    {/* Tavan (Dikdörtgenimsi) */}
+                    <path
+                        d="M 95 155 Q 150 150 205 155 L 205 240 Q 150 245 95 240 Z"
+                        className={cn("transition-colors duration-300", getPartColor('Tavan'))}
+                    />
 
-                        {/* Sol Arka Çamurluk (Üstteki kavisli parça) */}
-                        <path
-                            id={partIdMap['Sol Arka Çamurluk']}
-                            className={cn("transition-colors", getPartColor('Sol Arka Çamurluk'))}
-                            d="M275,75 C150,75 150,200 150,260 L220,260 L275,220 Z"
-                        />
-                        {/* Sol Arka Kapı */}
-                        <path
-                            id={partIdMap['Sol Arka Kapı']}
-                            className={cn("transition-colors", getPartColor('Sol Arka Kapı'))}
-                            d="M150,265 L220,265 L230,450 L155,470 C150,400 150,350 150,265 Z"
-                        />
-                        {/* Sol Ön Kapı */}
-                        <path
-                            id={partIdMap['Sol Ön Kapı']}
-                            className={cn("transition-colors", getPartColor('Sol Ön Kapı'))}
-                            d="M155,475 L230,455 L245,650 L170,680 C165,600 160,550 155,475 Z"
-                        />
-                        {/* Sol Ön Çamurluk (Alttaki kavisli parça) */}
-                        <path
-                            id={partIdMap['Sol Ön Çamurluk']}
-                            className={cn("transition-colors", getPartColor('Sol Ön Çamurluk'))}
-                            d="M170,685 L245,655 L285,860 C200,860 150,800 170,685 Z"
-                        />
-                         {/* Sol Ayna (Görsel amaçlı, boyanmaz) */}
-                        <path d="M245,620 L280,610 L285,640 L250,650 Z" fill="#e5e7eb" stroke="none"/>
-                    </g>
+                    {/* Arka Cam (Görsel) */}
+                    <path
+                        d="M 95 245 Q 150 250 205 245 L 210 270 Q 150 275 90 270 Z"
+                        className="fill-blue-50/50 stroke-gray-300"
+                    />
+
+                    {/* Bagaj */}
+                    <path
+                        d="M 90 275 Q 150 280 210 275 L 210 330 Q 150 340 90 330 Z"
+                        className={cn("transition-colors duration-300", getPartColor('Bagaj'))}
+                    />
+
+                    {/* Arka Tampon */}
+                    <path
+                        d="M 85 335 Q 150 345 215 335 L 215 360 Q 150 375 85 360 Z"
+                        className={cn("transition-colors duration-300", getPartColor('Arka Tampon'))}
+                    />
 
 
-                    {/* --- SAĞ TARAF (Sağ Çamurluklar ve Kapılar - Solun Aynası) --- */}
-                    <g id="right-side" transform="scale(-1, 1) translate(-800, 0)">
-                         {/* Etiketler (Aynalandığı için textleri düzeltiyoruz) */}
-                        <text x="720" y="500" className="text-xl fill-gray-500 font-semibold" transform="rotate(90 720,500) scale(-1,1) translate(-1440,0)">SAĞ</text>
+                    {/* --- SOL KANAT (Sol Parçalar) --- */}
 
-                        {/* Sağ Arka Çamurluk */}
-                        <path
-                            id={partIdMap['Sağ Arka Çamurluk']}
-                            className={cn("transition-colors", getPartColor('Sağ Arka Çamurluk'))}
-                            d="M275,75 C150,75 150,200 150,260 L220,260 L275,220 Z"
-                        />
-                        {/* Sağ Arka Kapı */}
-                        <path
-                            id={partIdMap['Sağ Arka Kapı']}
-                            className={cn("transition-colors", getPartColor('Sağ Arka Kapı'))}
-                            d="M150,265 L220,265 L230,450 L155,470 C150,400 150,350 150,265 Z"
-                        />
-                        {/* Sağ Ön Kapı */}
-                        <path
-                            id={partIdMap['Sağ Ön Kapı']}
-                            className={cn("transition-colors", getPartColor('Sağ Ön Kapı'))}
-                            d="M155,475 L230,455 L245,650 L170,680 C165,600 160,550 155,475 Z"
-                        />
-                        {/* Sağ Ön Çamurluk */}
-                        <path
-                            id={partIdMap['Sağ Ön Çamurluk']}
-                            className={cn("transition-colors", getPartColor('Sağ Ön Çamurluk'))}
-                            d="M170,685 L245,655 L285,860 C200,860 150,800 170,685 Z"
-                        />
-                         {/* Sağ Ayna */}
-                         <path d="M245,620 L280,610 L285,640 L250,650 Z" fill="#e5e7eb" stroke="none"/>
-                    </g>
+                    {/* Sol Ön Çamurluk (Tekerlek oyuğu ile) */}
+                    <path
+                        d="M 80 45 L 40 45 L 40 90 A 25 25 0 0 1 65 115 L 85 115 Z"
+                        className={cn("transition-colors duration-300", getPartColor('Sol Ön Çamurluk'))}
+                    />
 
-                </g>
-            </svg>
+                    {/* Sol Ön Kapı (Cam çerçevesi ile bütünleşik panel) */}
+                    <path
+                        d="M 85 120 L 35 120 L 35 200 L 90 200 Z"
+                        className={cn("transition-colors duration-300", getPartColor('Sol Ön Kapı'))}
+                    />
 
-            {/* --- RENK LEJANTI (Mevcut koddan korundu) --- */}
-            <div className="mt-8 flex flex-wrap justify-center gap-x-6 gap-y-3 bg-gray-50 p-4 rounded-lg border">
-                <div className="flex items-center gap-2">
-                    <div className="h-5 w-5 rounded-md bg-gray-100 border-2 border-gray-300"></div>
-                    <span className="text-sm font-medium text-gray-700">Orijinal</span>
-                </div>
-                <div className="flex items-center gap-2">
-                    <div className="h-5 w-5 rounded-md bg-yellow-400 border-2 border-yellow-500"></div>
-                    <span className="text-sm font-medium text-gray-700">Boyalı</span>
-                </div>
-                <div className="flex items-center gap-2">
-                    <div className="h-5 w-5 rounded-md bg-red-500 border-2 border-red-600"></div>
-                    <span className="text-sm font-medium text-gray-700">Değişen</span>
-                </div>
-                {/* Not: Görseldeki Mor (Lokal Boya) ve diğer durumlar mevcut kod yapınızda olmadığı için eklenmedi. 
-                    İstenirse statusColors objesine ve buraya eklenebilir. */}
+                    {/* Sol Arka Kapı */}
+                    <path
+                        d="M 90 205 L 35 205 L 35 275 L 85 275 Z"
+                        className={cn("transition-colors duration-300", getPartColor('Sol Arka Kapı'))}
+                    />
+
+                    {/* Sol Arka Çamurluk (Tekerlek oyuğu arkada) */}
+                    <path
+                        d="M 85 280 L 65 280 A 25 25 0 0 1 40 305 L 40 335 L 85 330 Z"
+                        className={cn("transition-colors duration-300", getPartColor('Sol Arka Çamurluk'))}
+                    />
+
+
+                    {/* --- SAĞ KANAT (Sağ Parçalar) --- */}
+
+                    {/* Sağ Ön Çamurluk */}
+                    <path
+                        d="M 220 45 L 260 45 L 260 90 A 25 25 0 0 0 235 115 L 215 115 Z"
+                        className={cn("transition-colors duration-300", getPartColor('Sağ Ön Çamurluk'))}
+                    />
+
+                    {/* Sağ Ön Kapı */}
+                    <path
+                        d="M 215 120 L 265 120 L 265 200 L 210 200 Z"
+                        className={cn("transition-colors duration-300", getPartColor('Sağ Ön Kapı'))}
+                    />
+
+                    {/* Sağ Arka Kapı */}
+                    <path
+                        d="M 210 205 L 265 205 L 265 275 L 215 275 Z"
+                        className={cn("transition-colors duration-300", getPartColor('Sağ Arka Kapı'))}
+                    />
+
+                    {/* Sağ Arka Çamurluk */}
+                    <path
+                        d="M 215 280 L 235 280 A 25 25 0 0 0 260 305 L 260 335 L 215 330 Z"
+                        className={cn("transition-colors duration-300", getPartColor('Sağ Arka Çamurluk'))}
+                    />
+
+                    {/* Yönlendirme Yazıları */}
+                    <text x="20" y="200" className="text-[10px] fill-gray-400 -rotate-90">SOL TARAF</text>
+                    <text x="280" y="200" className="text-[10px] fill-gray-400 rotate-90">SAĞ TARAF</text>
+                    <text x="150" y="15" className="text-[10px] fill-gray-400 text-center" textAnchor="middle">ÖN</text>
+                    <text x="150" y="380" className="text-[10px] fill-gray-400 text-center" textAnchor="middle">ARKA</text>
+
+                </svg>
             </div>
 
-            {/* --- PARÇA LİSTESİ (Mevcut koddan korundu) --- */}
-            <div className="mt-6 w-full max-w-md space-y-2">
+            {/* Renk Açıklamaları (Legend) */}
+            <div className="mt-6 flex flex-wrap justify-center gap-4 border-t pt-4 w-full">
+                <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 rounded-full bg-gray-100 border border-gray-400 shadow-sm"></div>
+                    <span className="text-xs font-medium text-gray-600">Orijinal</span>
+                </div>
+                <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 rounded-full bg-yellow-400 border border-yellow-500 shadow-sm"></div>
+                    <span className="text-xs font-medium text-gray-600">Boyalı</span>
+                </div>
+                <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 rounded-full bg-red-500 border border-red-600 shadow-sm"></div>
+                    <span className="text-xs font-medium text-gray-600">Değişen</span>
+                </div>
+            </div>
+
+            {/* Liste Görünümü (Mobilde okumayı kolaylaştırmak için) */}
+            <div className="mt-6 w-full grid grid-cols-2 gap-2 sm:grid-cols-3">
                 {partKeys.map(key => {
                     const status = report[key];
                     if (status && status !== 'Orijinal') {
                         return (
-                            <div key={key} className="flex justify-between items-center bg-white border p-3 rounded-md text-sm shadow-sm">
-                                <span className="text-gray-700 font-medium">{key}</span>
+                            <div key={key} className="flex items-center justify-between p-2 bg-gray-50 rounded border text-xs">
+                                <span className="text-gray-700 truncate mr-2">{key}</span>
                                 <span className={cn(
-                                    "font-bold px-2 py-1 rounded-full text-xs uppercase tracking-wider",
-                                    status === 'Boyalı' && 'bg-yellow-100 text-yellow-800 border border-yellow-200',
-                                    status === 'Değişen' && 'bg-red-100 text-red-800 border border-red-200',
-                                )}>
-                                    {status}
-                                </span>
+                                    "w-2 h-2 rounded-full",
+                                    status === 'Boyalı' && 'bg-yellow-400',
+                                    status === 'Değişen' && 'bg-red-500'
+                                )} />
                             </div>
                         )
                     }
@@ -208,4 +198,3 @@ export default function ExpertiseVisualizer({ report }: ExpertiseVisualizerProps
         </div>
     );
 }
-
