@@ -51,30 +51,30 @@ export default function ExpertiseVisualizer({ report }: ExpertiseVisualizerProps
             >
                 <g id="car-schema" stroke="#6b7280" strokeWidth="1">
                     {/* Left Side */}
-                    <g id="left-panels" transform="translate(50, 50)">
-                         <text x="35" y="-10" textAnchor="middle" fontSize="14" fill="#6b7280">Sol</text>
-                        <path id={partIdMap['Sol Ön Çamurluk']} className={cn("transition-colors", getPartColor('Sol Ön Çamurluk'))} d="M0,50 Q20,60 70,50 L70,0 L20,0 Q0,10 0,50 Z" />
-                        <path id={partIdMap['Sol Ön Kapı']} className={cn("transition-colors", getPartColor('Sol Ön Kapı'))} d="M0,55 L70,55 L70,155 L0,155 Z" />
-                        <path id={partIdMap['Sol Arka Kapı']} className={cn("transition-colors", getPartColor('Sol Arka Kapı'))} d="M0,160 L70,160 L70,260 L0,260 Z" />
-                        <path id={partIdMap['Sol Arka Çamurluk']} className={cn("transition-colors", getPartColor('Sol Arka Çamurluk'))} d="M0,265 L70,265 L70,315 Q20,315 0,265 Z" />
+                    <g id="left-panels" transform="translate(40, 50)">
+                         <text x="50" y="-10" textAnchor="middle" fontSize="14" fill="#6b7280">Sol</text>
+                        <path id={partIdMap['Sol Ön Çamurluk']} className={cn("transition-colors", getPartColor('Sol Ön Çamurluk'))} d="M0,50 C20,55 80,45 100,50 L100,0 L20,0 C0,15 0,35 0,50 Z" />
+                        <path id={partIdMap['Sol Ön Kapı']} className={cn("transition-colors", getPartColor('Sol Ön Kapı'))} d="M0,55 L100,55 L100,155 L0,155 Z" />
+                        <path id={partIdMap['Sol Arka Kapı']} className={cn("transition-colors", getPartColor('Sol Arka Kapı'))} d="M0,160 L100,160 L100,260 L0,260 Z" />
+                        <path id={partIdMap['Sol Arka Çamurluk']} className={cn("transition-colors", getPartColor('Sol Arka Çamurluk'))} d="M0,265 L100,265 L100,315 C80,325 20,315 0,265 Z" />
                     </g>
                     
                     {/* Center Column */}
-                    <g id="center-panels" transform="translate(150, 0)">
-                        <path id={partIdMap['Ön Tampon']} className={cn("transition-colors", getPartColor('Ön Tampon'))} d="M0,30 L150,30 L130,0 L20,0 Z" />
-                        <path id={partIdMap['Kaput']} className={cn("transition-colors", getPartColor('Kaput'))} d="M0,35 L150,35 L150,135 L0,135 Z" />
-                        <path id={partIdMap['Tavan']} className={cn("transition-colors", getPartColor('Tavan'))} d="M0,140 L150,140 L150,290 L0,290 Z" />
-                        <path id={partIdMap['Bagaj']} className={cn("transition-colors", getPartColor('Bagaj'))} d="M0,295 L150,295 L150,395 L0,395 Z" />
-                        <path id={partIdMap['Arka Tampon']} className={cn("transition-colors", getPartColor('Arka Tampon'))} d="M20,425 L130,425 L150,395 L0,395 Z" />
+                    <g id="center-panels" transform="translate(160, 0)">
+                        <path id={partIdMap['Ön Tampon']} className={cn("transition-colors", getPartColor('Ön Tampon'))} d="M5,25 C20,0 110,0 125,25 L130,50 L0,50 Z" />
+                        <path id={partIdMap['Kaput']} className={cn("transition-colors", getPartColor('Kaput'))} d="M0,55 L130,55 L120,155 L10,155 Z" />
+                        <path id={partIdMap['Tavan']} className={cn("transition-colors", getPartColor('Tavan'))} d="M10,160 L120,160 L110,310 L20,310 Z" />
+                        <path id={partIdMap['Bagaj']} className={cn("transition-colors", getPartColor('Bagaj'))} d="M20,315 L110,315 L100,395 L30,395 Z" />
+                        <path id={partIdMap['Arka Tampon']} className={cn("transition-colors", getPartColor('Arka Tampon'))} d="M30,400 L100,400 C115,425 15,425 0,400 Z" />
                     </g>
 
                     {/* Right Side */}
-                    <g id="right-panels" transform="translate(330, 50)">
-                         <text x="35" y="-10" textAnchor="middle" fontSize="14" fill="#6b7280">Sağ</text>
-                        <path id={partIdMap['Sağ Ön Çamurluk']} className={cn("transition-colors", getPartColor('Sağ Ön Çamurluk'))} d="M0,0 L50,0 Q70,10 70,50 Q50,60 0,50 L0,0 Z" />
-                        <path id={partIdMap['Sağ Ön Kapı']} className={cn("transition-colors", getPartColor('Sağ Ön Kapı'))} d="M0,55 L70,55 L70,155 L0,155 Z" />
-                        <path id={partIdMap['Sağ Arka Kapı']} className={cn("transition-colors", getPartColor('Sağ Arka Kapı'))} d="M0,160 L70,160 L70,260 L0,260 Z" />
-                        <path id={partIdMap['Sağ Arka Çamurluk']} className={cn("transition-colors", getPartColor('Sağ Arka Çamurluk'))} d="M0,315 L50,315 Q70,265 0,265 Z" />
+                    <g id="right-panels" transform="translate(290, 50)">
+                         <text x="50" y="-10" textAnchor="middle" fontSize="14" fill="#6b7280">Sağ</text>
+                        <path id={partIdMap['Sağ Ön Çamurluk']} className={cn("transition-colors", getPartColor('Sağ Ön Çamurluk'))} d="M0,0 L80,0 C100,15 100,35 100,50 C80,45 20,55 0,50 L0,0 Z" />
+                        <path id={partIdMap['Sağ Ön Kapı']} className={cn("transition-colors", getPartColor('Sağ Ön Kapı'))} d="M0,55 L100,55 L100,155 L0,155 Z" />
+                        <path id={partIdMap['Sağ Arka Kapı']} className={cn("transition-colors", getPartColor('Sağ Arka Kapı'))} d="M0,160 L100,160 L100,260 L0,260 Z" />
+                        <path id={partIdMap['Sağ Arka Çamurluk']} className={cn("transition-colors", getPartColor('Sağ Arka Çamurluk'))} d="M0,265 C20,315 80,325 100,315 L100,265 L0,265 Z" />
                     </g>
                 </g>
             </svg>
