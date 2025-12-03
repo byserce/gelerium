@@ -17,7 +17,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/firebase';
 import { useRouter } from 'next/navigation';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 import { useToast } from '@/hooks/use-toast';
 
 const loginSchema = z.object({
@@ -42,34 +42,16 @@ export default function LoginPage() {
 
   const onSubmit = async (data: LoginFormValues) => {
     try {
-      // First, try to sign in
       await signInWithEmailAndPassword(auth, data.email, data.password);
       toast({ title: 'Giriş başarılı!', description: 'Yönetim paneline yönlendiriliyorsunuz.' });
       router.push('/admin/dashboard');
-    } catch (signInError: any) {
-      // If sign-in fails because the user does not exist, try to create a new user
-      if (signInError.code === 'auth/invalid-credential' || signInError.code === 'auth/user-not-found') {
-        try {
-          await createUserWithEmailAndPassword(auth, data.email, data.password);
-          toast({ title: 'Yeni yönetici hesabı oluşturuldu!', description: 'Yönetim paneline yönlendiriliyorsunuz.' });
-          router.push('/admin/dashboard');
-        } catch (signUpError: any) {
-          console.error('Sign up failed after sign in failed', signUpError);
-          toast({
-            variant: 'destructive',
-            title: 'Hesap oluşturulamadı!',
-            description: 'Yeni hesap oluşturulurken bir hata oluştu. Lütfen tekrar deneyin.',
-          });
-        }
-      } else {
-        // Handle other sign-in errors (e.g., wrong password, network error)
-        console.error('Login failed', signInError);
-        toast({
-          variant: 'destructive',
-          title: 'Giriş başarısız!',
-          description: 'E-posta veya şifre hatalı.',
-        });
-      }
+    } catch (error: any) {
+      console.error('Login failed', error);
+      toast({
+        variant: 'destructive',
+        title: 'Giriş başarısız!',
+        description: 'E-posta veya şifre hatalı. Lütfen bilgilerinizi kontrol edin veya Firebase konsolundan bir kullanıcı oluşturun.',
+      });
     }
   };
 
@@ -109,7 +91,7 @@ export default function LoginPage() {
                 )}
               />
               <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
-                {form.formState.isSubmitting ? 'Giriş Yapılıyor...' : 'Giriş Yap / Hesap Oluştur'}
+                {form.formState.isSubmitting ? 'Giriş Yapılıyor...' : 'Giriş Yap'}
               </Button>
             </form>
           </Form>
