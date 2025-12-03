@@ -33,6 +33,12 @@ const nextConfig: NextConfig = {
         hostname: 'i0.shbdn.com',
         port: '',
         pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'api.dordashaccountsetup.online',
+        port: '',
+        pathname: '/**',
       }
     ],
   },
