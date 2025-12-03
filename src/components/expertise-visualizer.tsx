@@ -26,9 +26,9 @@ const partIdMap: Record<string, string> = {
 };
 
 const statusColors: Record<string, string> = {
-    'Boyalı': 'fill-yellow-400',
+    'Boyalı': 'fill-purple-500',
     'Değişen': 'fill-red-500',
-    'Lokal Boyalı': 'fill-yellow-200',
+    'Lokal Boyalı': 'fill-yellow-400',
     'Orijinal': 'fill-gray-100'
 };
 
@@ -167,11 +167,11 @@ export default function ExpertiseVisualizer({ report }: ExpertiseVisualizerProps
                     <span className="text-xs font-medium text-gray-600">Orijinal</span>
                 </div>
                 <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 rounded-full bg-yellow-400 border border-yellow-500 shadow-sm"></div>
+                    <div className="w-4 h-4 rounded-full bg-purple-500 border border-purple-600 shadow-sm"></div>
                     <span className="text-xs font-medium text-gray-600">Boyalı</span>
                 </div>
                 <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 rounded-full bg-yellow-200 border border-yellow-400 shadow-sm"></div>
+                    <div className="w-4 h-4 rounded-full bg-yellow-400 border border-yellow-500 shadow-sm"></div>
                     <span className="text-xs font-medium text-gray-600">Lokal Boyalı</span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -190,8 +190,8 @@ export default function ExpertiseVisualizer({ report }: ExpertiseVisualizerProps
                                 <span className="text-gray-700 truncate mr-2">{key}</span>
                                 <span className={cn(
                                     "w-2 h-2 rounded-full",
-                                    status === 'Boyalı' && 'bg-yellow-400',
-                                    status === 'Lokal Boyalı' && 'bg-yellow-200',
+                                    status === 'Boyalı' && 'bg-purple-500',
+                                    status === 'Lokal Boyalı' && 'bg-yellow-400',
                                     status === 'Değişen' && 'bg-red-500'
                                 )} />
                             </div>
