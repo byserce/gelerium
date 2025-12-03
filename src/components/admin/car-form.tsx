@@ -32,7 +32,7 @@ import Image from 'next/image';
 const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
 const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/avif'];
 
-const carSchema = z.object({
+const carSchemaBase = z.object({
   title: z.string().min(5, { message: 'Başlık en az 5 karakter olmalıdır.' }),
   brand: z.string().min(2, { message: 'Marka alanı zorunludur.' }),
   model: z.string().min(1, { message: 'Model alanı zorunludur.' }),
@@ -40,13 +40,26 @@ const carSchema = z.object({
   price: z.coerce.number().int().min(0, 'Fiyat negatif olamaz.'),
   km: z.coerce.number().int().min(0, 'Kilometre negatif olamaz.'),
   images: z.any()
-    .refine((files: FileList | null) => files !== null && files.length > 0, 'En az bir resim yüklemelisiniz.')
-    .refine((files: FileList | null) => Array.from(files ?? []).every(file => file.size <= MAX_FILE_SIZE), `Dosya boyutu 50MB'ı geçemez.`)
-    .refine((files: FileList | null) => Array.from(files ?? []).every(file => ACCEPTED_IMAGE_TYPES.includes(file.type)), 'Sadece .jpg, .jpeg, .png, .webp ve .avif formatları desteklenmektedir.'),
+    .refine((files?: FileList | null) => files && files.length > 0, 'En az bir resim yüklemelisiniz.')
+    .refine((files?: FileList | null) => Array.from(files ?? []).every(file => file.size <= MAX_FILE_SIZE), `Dosya boyutu 50MB'ı geçemez.`)
+    .refine((files?: FileList | null) => Array.from(files ?? []).every(file => ACCEPTED_IMAGE_TYPES.includes(file.type)), 'Sadece .jpg, .jpeg, .png, .webp ve .avif formatları desteklenmektedir.'),
   existingImageUrls: z.array(z.string()).optional(),
 });
 
-type CarFormValues = z.infer<typeof carSchema>;
+
+const carSchemaForEdit = carSchemaBase.extend({
+  images: carSchemaBase.shape.images.optional(), // Make images optional for editing
+}).refine(data => {
+    // If editing, at least one existing or new image must be present
+    return (data.existingImageUrls && data.existingImageUrls.length > 0) || (data.images && data.images.length > 0);
+}, {
+    message: 'En az bir resim gereklidir.',
+    path: ['images'], // Apply error to the images field
+});
+
+const carSchemaForAdd = carSchemaBase;
+
+type CarFormValues = z.infer<typeof carSchemaBase>;
 
 interface CarFormProps {
   isOpen: boolean;
@@ -57,12 +70,8 @@ interface CarFormProps {
 export default function CarForm({ isOpen, setIsOpen, car }: CarFormProps) {
   const { toast } = useToast();
   
-  const formSchemaForEdit = carSchema.extend({
-      images: carSchema.shape.images.optional(),
-  });
-
   const form = useForm<CarFormValues>({
-    resolver: zodResolver(car ? formSchemaForEdit : carSchema), 
+    resolver: zodResolver(car ? carSchemaForEdit : carSchemaForAdd), 
     defaultValues: {
       title: '',
       brand: '',
@@ -142,7 +151,7 @@ export default function CarForm({ isOpen, setIsOpen, car }: CarFormProps) {
     const dataTransfer = new DataTransfer();
     newFiles.forEach(file => dataTransfer.items.add(file));
 
-    setValue('images', dataTransfer.files, { shouldValidate: true });
+    setValue('images', dataTransfer.files.length > 0 ? dataTransfer.files : undefined, { shouldValidate: true });
   };
 
   return (
@@ -218,7 +227,7 @@ export default function CarForm({ isOpen, setIsOpen, car }: CarFormProps) {
                                 multiple
                                 className="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer"
                                 accept={ACCEPTED_IMAGE_TYPES.join(',')}
-                                onChange={(e) => onChange(e.target.files)}
+                                onChange={(e) => onChange(e.target.files && e.target.files.length > 0 ? e.target.files : undefined)}
                             />
                         </div>
                     </FormControl>
@@ -272,3 +281,5 @@ export default function CarForm({ isOpen, setIsOpen, car }: CarFormProps) {
     </Dialog>
   );
 }
+
+    
