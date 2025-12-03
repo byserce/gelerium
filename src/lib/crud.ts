@@ -33,6 +33,8 @@ export const addCar = async (carData: CarFormData, files: FileList) => {
     imageUrls,
     imagePaths,
   };
+  // Remove the temporary fields before updating the document
+  delete (newCarData as any).images;
   // Use addDoc for auto-generated ID
   return addDoc(carsCollection, newCarData);
 };
