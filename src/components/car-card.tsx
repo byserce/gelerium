@@ -17,8 +17,6 @@ export default function CarCard({ car }: CarCardProps) {
     maximumFractionDigits: 0,
   }).format(car.price);
 
-  const hasValidListingUrl = car.listingUrl && car.listingUrl.trim() !== '';
-
   return (
     <Card className="flex flex-col overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
       <CardHeader className="p-0">
@@ -79,17 +77,11 @@ export default function CarCard({ car }: CarCardProps) {
         </p>
       </CardContent>
       <CardFooter className="p-3 bg-muted/50">
-        {hasValidListingUrl ? (
-            <Button asChild size="sm" className="w-full bg-primary hover:bg-accent text-primary-foreground hover:text-accent-foreground text-xs">
-              <Link href={car.listingUrl!} target="_blank" rel="noopener noreferrer">
-                Sahibinden.com'da Gör
-              </Link>
-            </Button>
-          ) : (
-            <Button size="sm" className="w-full text-xs" disabled>
-              Detaylı Bilgi Yok
-            </Button>
-        )}
+        <Button size="sm" className="w-full text-xs" asChild>
+          <a href={`https://wa.me/905542140263?text=${encodeURIComponent(car.title + " hakkında bilgi almak istiyorum.")}`} target="_blank" rel="noopener noreferrer">
+              Detaylı Bilgi Al
+          </a>
+        </Button>
       </CardFooter>
     </Card>
   );

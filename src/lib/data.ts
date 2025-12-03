@@ -15,7 +15,7 @@ export const cars: Car[] = [
     "imageUrls": [
       "https://i0.shbdn.com/photos/39/99/46/lthmb_1283399946rdh.avif"
     ],
-    "listingUrl": "https://www.sahibinden.com/ilan/vasita-otomobil-opel-safkan-benzinli-kaput-boyasiz-1283399946/detay"
+    "imagePaths": []
   },
   {
     "id": "1286367961",
@@ -28,7 +28,7 @@ export const cars: Car[] = [
     "imageUrls": [
       "https://i0.shbdn.com/photos/36/79/61/lthmb_1286367961r59.avif"
     ],
-    "listingUrl": "https://www.sahibinden.com/ilan/vasita-otomobil-audi-emsalsiz-audi-otomotik-1286367961/detay"
+    "imagePaths": []
   },
   {
     "id": "1286336583",
@@ -41,7 +41,7 @@ export const cars: Car[] = [
     "imageUrls": [
       "https://i0.shbdn.com/photos/33/65/83/lthmb_128633658302g.avif"
     ],
-    "listingUrl": "https://www.sahibinden.com/ilan/vasita-otomobil-honda-lansman-renk-reflex-gri-dusuk-kmli-1286336583/detay"
+    "imagePaths": []
   },
   {
     "id": "1284402663",
@@ -54,6 +54,6 @@ export const cars: Car[] = [
     "imageUrls": [
       "https://i0.shbdn.com/photos/40/26/63/lthmb_1284402663iai.avif"
     ],
-    "listingUrl": "https://www.sahibinden.com/ilan/vasita-otomobil-honda-agir-bakimlari-yapilmis-otomotik-1284402663/detay"
+    "imagePaths": []
   }
 ];

@@ -5,7 +5,6 @@ import type { Car } from './types';
 
 export const scrapedCars: Omit<Car, 'id'>[] = [
   {
-    sahibindenId: '1168173481',
     title: '2017 VW PASSAT 1.6 TDI COMFORTLİNE DSG CAM TAVAN',
     price: 1385000,
     year: 2017,
@@ -17,10 +16,9 @@ export const scrapedCars: Omit<Car, 'id'>[] = [
       "https://images.unsplash.com/photo-1533630217389-3a5e4dff5683?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxjYXIlMjBpbnRlcmlvcnxlbnwwfHx8fDE3NjQ3NTEyODJ8MA&ixlib=rb-4.1.0&q=80&w=1080",
       "https://images.unsplash.com/photo-1597588561267-7a9507649ab9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHx3aGl0ZSUyMHNlZGFufGVufDB8fHx8MTc2NDcxNzg0Mnww&ixlib=rb-4.1.0&q=80&w=1080"
     ],
-    listingUrl: 'https://www.sahibinden.com/ilan/vasita-otomobil-volkswagen-2017-vw-passat-1.6-tdi-comfortline-dsg-cam-tavan-1168173481/detay',
+    imagePaths: []
   },
   {
-    sahibindenId: '1166412497',
     title: '2023 SKODA SUPERB 1.5 TSI PRESTIGE DSG 18 JANT',
     price: 2100000,
     year: 2023,
@@ -32,10 +30,9 @@ export const scrapedCars: Omit<Car, 'id'>[] = [
       "https://images.unsplash.com/photo-1471174617910-3e9c04f58ff5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxjYXIlMjBpbnRlcmlvcnxlbnwwfHx8fDE3NjQ3NTEyODJ8MA&ixlib=rb-4.1.0&q=80&w=1080",
       "https://images.unsplash.com/photo-1533106418989-88406c7cc8ca?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxjYXIlMjBoZWFkbGlnaHRzfGVufDB8fHx8MTc2NDc1MTI4Mnww&ixlib=rb-4.1.0&q=80&w=1080"
     ],
-    listingUrl: 'https://www.sahibinden.com/ilan/vasita-otomobil-skoda-2023-skoda-superb-1.5-tsi-prestige-dsg-18-jant-1166412497/detay',
+    imagePaths: []
   },
   {
-    sahibindenId: '1165780287',
     title: '2022 MERCEDES C200 4 MATIC AMG',
     price: 2900000,
     year: 2022,
@@ -47,14 +44,12 @@ export const scrapedCars: Omit<Car, 'id'>[] = [
       "https://images.unsplash.com/photo-1686675762642-e12ad7762971?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxsZWF0aGVyJTIwc2VhdHN8ZW58MHx8fHwxNzY0Njc2MjgxfDA&ixlib=rb-4.1.0&q=80&w=1080",
       "https://images.unsplash.com/photo-1623564493214-6137dff043ad?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxhbGxveSUyMHdoZWVsfGVufDB8fHx8MTc2NDc1MTI4Mnww&ixlib=rb-4.1.0&q=80&w=1080"
     ],
-    listingUrl: 'https://www.sahibinden.com/ilan/vasita-otomobil-mercedes-benz-2022-mercedes-c200-4-matic-amg-1165780287/detay',
+    imagePaths: []
   },
   // This listing has a slightly different price to test the AI consistency check
   {
-    sahibindenId: '1150247659',
     title: '2023 PEUGEOT 3008 1.5 BLUEHDI ALLURE',
     price: 1849000, // Price changed
-    year: 2023,
     km: 15500, // KM changed
     brand: 'Peugeot',
     model: '3008',
@@ -63,6 +58,6 @@ export const scrapedCars: Omit<Car, 'id'>[] = [
       "https://images.unsplash.com/photo-1575388902449-6bca946ad549?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxmdXR1cmlzdGljJTIwZGFzaGJvYXJkfGVufDB8fHx8MTc2NDc1MTI4Mnww&ixlib=rb-4.1.0&q=80&w=1080",
       "https://images.unsplash.com/photo-1725745096249-f6e7c160c4be?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxjYXIlMjB0YWlsbGlnaHR8ZW58MHx8fHwxNzY0NzM2NzM4fDA&ixlib=rb-4.1.0&q=80&w=1080"
     ],
-    listingUrl: 'https://www.sahibinden.com/ilan/vasita-otomobil-peugeot-2023-peugeot-3008-1.5-bluehdi-allure-1150247659/detay',
+    imagePaths: []
   },
 ];
