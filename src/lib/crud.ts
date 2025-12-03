@@ -9,7 +9,7 @@ async function uploadImages(files: FileList) {
     for (const file of Array.from(files)) {
         const fileExtension = file.name.split('.').pop();
         const fileName = `${uuidv4()}.${fileExtension}`;
-        const filePath = `public/${fileName}`; // Changed to public to match new setup if needed
+        const filePath = `public/${fileName}`;
 
         const { error: uploadError } = await supabase.storage
             .from('vehicle-images')
@@ -52,9 +52,9 @@ export async function addCar(data: any) {
         title: data.title,
         brand: data.brand,
         model: data.model,
-        year: data.year,
-        price: data.price,
-        kilometer: data.km,
+        year: Number(data.year),
+        price: Number(data.price),
+        kilometer: Number(data.km),
         image_urls: newImageUrls,
         image_paths: newImagePaths,
     };
@@ -110,9 +110,9 @@ export async function updateCar(data: any, imagesToRemove: string[], existingPat
         title: data.title,
         brand: data.brand,
         model: data.model,
-        year: data.year,
-        price: data.price,
-        kilometer: data.km,
+        year: Number(data.year),
+        price: Number(data.price),
+        kilometer: Number(data.km),
         image_urls: finalImageUrls,
         image_paths: finalImagePaths,
     };
