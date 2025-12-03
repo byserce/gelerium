@@ -26,11 +26,11 @@ export default function Footer() {
                         <ul className="space-y-3 text-primary-foreground/80">
                             <li className="flex items-center gap-3 justify-center md:justify-start">
                                 <MapPin className="h-5 w-5 text-accent"/>
-                                <span>Oto Center, Bağcılar/İstanbul</span>
+                                <span>Denizli Honaz Galericiler Sitesi</span>
                             </li>
                             <li className="flex items-center gap-3 justify-center md:justify-start">
                                 <Phone className="h-5 w-5 text-accent"/>
-                                <a href="tel:+905000000000" className="hover:text-accent transition-colors">+90 500 000 00 00</a>
+                                <a href="tel:+905542140263" className="hover:text-accent transition-colors">+90 554 214 02 63</a>
                             </li>
                         </ul>
                     </div>

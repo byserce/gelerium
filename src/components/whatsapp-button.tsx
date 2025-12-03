@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 export default function WhatsAppButton() {
-    const phoneNumber = "905000000000"; // Replace with dealership's number
+    const phoneNumber = "905542140263"; // Replace with dealership's number
     const message = "Merhaba, Avşarlı Otomotiv web sitenizden bir araç hakkında bilgi almak istiyorum.";
 
     return (

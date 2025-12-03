@@ -24,7 +24,7 @@ export default function Header() {
                         <Link href="#contact">İletişim</Link>
                     </Button>
                 </nav>
-                <a href="tel:+905000000000" className="hidden md:inline-flex">
+                <a href="tel:+905542140263" className="hidden md:inline-flex">
                     <Button className="bg-primary hover:bg-accent text-primary-foreground hover:text-accent-foreground">
                         Hemen Ara
                     </Button>
@@ -59,7 +59,7 @@ export default function Header() {
                                     </SheetClose>
                                 </nav>
                                 <div className="p-6 mt-auto">
-                                    <a href="tel:+905000000000" className="w-full">
+                                    <a href="tel:+905542140263" className="w-full">
                                         <Button size="lg" className="w-full bg-primary text-primary-foreground">
                                             Hemen Ara
                                         </Button>
@@ -73,5 +73,3 @@ export default function Header() {
         </header>
     );
 }
-
-    

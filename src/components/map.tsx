@@ -3,7 +3,7 @@
 import { APIProvider, Map, Marker } from '@vis.gl/react-google-maps';
 
 export default function DealershipMap() {
-    const position = { lat: 41.0335, lng: 28.8202 }; // Placeholder: Oto Center, Bağcılar
+    const position = { lat: 37.7909, lng: 29.4116 }; // Placeholder: Denizli Honaz
     const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
     if (!apiKey) {

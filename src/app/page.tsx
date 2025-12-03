@@ -130,11 +130,11 @@ export default function Home() {
                <div className="space-y-4 text-lg">
                 <p className="flex items-center gap-3">
                   <MapPin className="h-6 w-6 text-accent" />
-                  <span>Oto Center Galericiler Sitesi, No:123, Bağcılar/İstanbul</span>
+                  <span>Denizli Honaz Galericiler Sitesi</span>
                 </p>
                 <p className="flex items-center gap-3">
                   <Phone className="h-6 w-6 text-accent" />
-                  <a href="tel:+905000000000" className="hover:underline">+90 500 000 00 00</a>
+                  <a href="tel:+905542140263" className="hover:underline">+90 554 214 02 63</a>
                 </p>
               </div>
               <p className="text-muted-foreground">Harita üzerinden konumumuzu görüntüleyebilir ve kolayca yol tarifi alabilirsiniz.</p>
