@@ -1,6 +1,6 @@
 'use client';
 
-import React, 'react';
+import React from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -56,8 +56,13 @@ interface CarFormProps {
 
 export default function CarForm({ isOpen, setIsOpen, car }: CarFormProps) {
   const { toast } = useToast();
+  
+  const formSchemaForEdit = carSchema.extend({
+      images: carSchema.shape.images.optional(),
+  });
+
   const form = useForm<CarFormValues>({
-    resolver: zodResolver(car), // Updated schema will be applied dynamically
+    resolver: zodResolver(car ? formSchemaForEdit : carSchema), 
     defaultValues: {
       title: '',
       brand: '',
@@ -73,16 +78,6 @@ export default function CarForm({ isOpen, setIsOpen, car }: CarFormProps) {
   const { watch, setValue, control } = form;
   const selectedFiles = watch('images');
   const existingImages = watch('existingImageUrls');
-
-  React.useEffect(() => {
-    // Dynamically adjust schema based on whether we are editing or creating
-    const currentSchema = car
-      ? carSchema.extend({ images: carSchema.shape.images.optional() })
-      : carSchema;
-      
-    form.trigger(); // re-validate
-  }, [car, form]);
-
 
   React.useEffect(() => {
     if (isOpen) {
@@ -224,7 +219,7 @@ export default function CarForm({ isOpen, setIsOpen, car }: CarFormProps) {
                              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
                                 {existingImages.map(url => (
                                     <div key={url} className="relative group aspect-square">
-                                        <Image src={url} alt="Mevcut resim" layout="fill" className="object-cover rounded-md" />
+                                        <Image src={url} alt="Mevcut resim" fill className="object-cover rounded-md" />
                                         <button type="button" onClick={() => removeExistingImage(url)} className="absolute top-1 right-1 bg-red-600 text-white rounded-full p-0.5 opacity-75 group-hover:opacity-100 transition-opacity">
                                             <X className="h-3 w-3" />
                                         </button>
@@ -239,7 +234,7 @@ export default function CarForm({ isOpen, setIsOpen, car }: CarFormProps) {
                             <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
                                 {Array.from(selectedFiles).map((file, index) => (
                                     <div key={index} className="relative group aspect-square">
-                                        <Image src={URL.createObjectURL(file)} alt={`Preview ${index}`} layout="fill" className="object-cover rounded-md" />
+                                        <Image src={URL.createObjectURL(file)} alt={`Preview ${index}`} fill className="object-cover rounded-md" />
                                     </div>
                                 ))}
                             </div>
@@ -249,7 +244,7 @@ export default function CarForm({ isOpen, setIsOpen, car }: CarFormProps) {
                 )}
               />
 
-              <DialogFooter className="md:col-span-2 mt-4 pt-4 border-t sticky bottom-0 bg-background">
+              <DialogFooter className="md:col-span-2 mt-4 pt-4 border-t sticky bottom-0 bg-card">
                 <DialogClose asChild>
                   <Button type="button" variant="secondary">İptal</Button>
                 </DialogClose>
@@ -264,3 +259,5 @@ export default function CarForm({ isOpen, setIsOpen, car }: CarFormProps) {
     </Dialog>
   );
 }
+
+    
