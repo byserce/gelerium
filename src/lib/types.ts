@@ -7,5 +7,5 @@ export type Car = {
   price: number;
   km: number;
   imageUrls: string[];
-  imagePaths?: string[]; // Store storage paths for deletion
+  imagePaths: string[]; // Store storage paths for deletion
 };

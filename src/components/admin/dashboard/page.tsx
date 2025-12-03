@@ -25,6 +25,7 @@ import {
 } from '@/components/ui/dialog';
 import { PlusCircle, Edit, Trash2, Image as ImageIcon } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { Skeleton } from '@/components/ui/skeleton';
 import { deleteDoc } from '@/lib/crud';
 
 export default function AdminDashboard() {
@@ -80,21 +81,22 @@ export default function AdminDashboard() {
   const handleDelete = async (car: Car) => {
     if (!car.id) return;
     try {
-      await deleteDoc('listings', car.id);
-
-      // Delete associated images from storage
+      // Delete associated images from storage first
       if (car.imagePaths && car.imagePaths.length > 0) {
         const { error: storageError } = await supabase.storage.from('vehicle-images').remove(car.imagePaths);
         if (storageError) {
+          // Log the error but proceed to delete the DB record
           console.error('Error deleting images from storage:', storageError);
-          // Non-blocking error, we can still show success for DB deletion
-          toast({
+           toast({
             variant: 'destructive',
             title: 'Depolama Hatası',
-            description: `İlan veritabanından silindi ancak ilişkili resimler silinemedi: ${storageError.message}`,
+            description: `İlan resimleri silinemedi, ancak ilan veritabanından silinecektir: ${storageError.message}`,
           });
         }
       }
+
+      // Then delete the document from the database
+      await deleteDoc('listings', car.id);
 
       toast({
         title: 'Başarılı!',
