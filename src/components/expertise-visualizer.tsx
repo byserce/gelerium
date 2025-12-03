@@ -154,26 +154,3 @@ export default function ExpertiseVisualizer({ report }: ExpertiseVisualizerProps
         </div>
     );
 }
-
-// A more detailed SVG for future use
-const detailedSVG = `
-  <g id="car-body" stroke="#333" stroke-width="2" fill-rule="evenodd">
-    <path id="front_bumper" class="${getPartColor('Ön Tampon')}" d="M102,236 L102,260 L38,260 L38,236 L102,236 Z" />
-    <path id="hood" class="${getPartColor('Kaput')}" d="M102,184 L102,236 L38,236 L38,184 L102,184 Z" transform="skewX(-20) translate(60, 0)" />
-    <path id="front_fender_left" class="${getPartColor('Sol Ön Çamurluk')}" d="M188,184 L188,260 L124,260 L124,184 L188,184 Z" transform="skewX(-20) translate(40,0)" />
-    <path id="front_door_left" class="${getPartColor('Sol Ön Kapı')}" d="M266,184 L266,260 L202,260 L202,184 L266,184 Z" />
-    <path id="rear_door_left" class="${getPartColor('Sol Arka Kapı')}" d="M344,184 L344,260 L280,260 L280,184 L344,184 Z" />
-    <path id="rear_fender_left" class="${getPartColor('Sol Arka Çamurluk')}" d="M422,184 L422,260 L358,260 L358,184 L422,184 Z" transform="skewX(20) translate(-40,0)" />
-    <path id="trunk" class="${getPartColor('Bagaj')}" d="M490,184 L490,236 L436,236 L436,184 L490,184 Z" transform="skewX(20) translate(-60, 0)" />
-    <path id="rear_bumper" class="${getPartColor('Arka Tampon')}" d="M518,236 L518,260 L454,260 L454,236 L518,236 Z" />
-    <path id="roof" class="${getPartColor('Tavan')}" d="M202,124 L358,124 L328,184 L232,184Z" />
-    
-    <g transform="translate(560, 0) scale(-1, 1) translate(-560, 0)">
-        <path id="front_fender_right" class="${getPartColor('Sağ Ön Çamurluk')}" d="M188,184 L188,260 L124,260 L124,184 L188,184 Z" transform="skewX(-20) translate(40,0)" />
-        <path id="front_door_right" class="${getPartColor('Sağ Ön Kapı')}" d="M266,184 L266,260 L202,260 L202,184 L266,184 Z" />
-        <path id="rear_door_right" class="${getPartColor('Sağ Arka Kapı')}" d="M344,184 L344,260 L280,260 L280,184 L344,184 Z" />
-        <path id="rear_fender_right" class="${getPartColor('Sağ Arka Çamurluk')}" d="M422,184 L422,260 L358,260 L358,184 L422,184 Z" transform="skewX(20) translate(-40,0)" />
-    </g>
-  </g>
-`;
-
