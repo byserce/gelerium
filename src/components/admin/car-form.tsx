@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { UploadCloud, X, Trash2 } from 'lucide-react';
+import { UploadCloud, X } from 'lucide-react';
 import NextImage from 'next/image';
 import type { Car } from '@/lib/types';
 import { addCar, updateCar } from '@/lib/crud';
@@ -24,25 +24,25 @@ const baseSchema = z.object({
   price: z.coerce.number().min(0, 'Fiyat 0\'dan büyük olmalıdır.'),
   km: z.coerce.number().int().min(0, 'Kilometre negatif olamaz.'),
   existingImageUrls: z.array(z.string()).optional(),
+  existingImagePaths: z.array(z.string()).optional(), // Add this to carry over paths
 });
 
 const imageSchema = z.any()
-  .refine((files: FileList | null | undefined) => !files || files.length > 0, {
-    message: 'En az bir resim yüklemelisiniz.',
+  .refine((files: FileList | null | undefined): files is FileList => files !== null && files !== undefined, {
+    message: 'Resimler null veya undefined olamaz.',
   })
-  .refine((files: FileList | null) => Array.from(files ?? []).every(file => file.size <= MAX_FILE_SIZE), `Dosya boyutu 50MB'ı geçemez.`)
-  .refine((files: FileList | null) => Array.from(files ?? []).every(file => ACCEPTED_IMAGE_TYPES.includes(file.type)), 'Sadece .jpg, .jpeg, .png, .webp ve .avif formatları desteklenmektedir.');
+  .refine((files: FileList) => files.length > 0, 'En az bir resim yüklemelisiniz.')
+  .refine((files: FileList) => Array.from(files).every(file => file.size <= MAX_FILE_SIZE), `Dosya boyutu 50MB'ı geçemez.`)
+  .refine((files: FileList) => Array.from(files).every(file => ACCEPTED_IMAGE_TYPES.includes(file.type)), 'Sadece .jpg, .jpeg, .png, .webp ve .avif formatları desteklenmektedir.');
 
 const createCarSchema = baseSchema.extend({
-  images: imageSchema.refine((files: FileList | null) => files && files.length > 0, {
-    message: "Yeni ilanlar için en az bir resim gereklidir."
-  })
+  images: imageSchema,
 });
 
 const updateCarSchema = baseSchema.extend({
   images: imageSchema.optional(),
 }).superRefine((data, ctx) => {
-    if (data.images?.length === 0 && (!data.existingImageUrls || data.existingImageUrls.length === 0)) {
+    if ((!data.images || data.images.length === 0) && (!data.existingImageUrls || data.existingImageUrls.length === 0)) {
          ctx.addIssue({
             code: z.ZodIssueCode.custom,
             path: ['images'],
@@ -63,7 +63,10 @@ interface CarFormProps {
 export default function CarForm({ car, onSuccess, onCancel }: CarFormProps) {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [imagePreviews, setImagePreviews] = useState<string[]>(car?.imageUrls || []);
+  // Separate states for existing images
+  const [existingImages, setExistingImages] = useState<{ url: string, path: string }[]>(
+    car?.imageUrls?.map((url, i) => ({ url, path: car.imagePaths[i] })) || []
+  );
   const [imagesToRemove, setImagesToRemove] = useState<string[]>([]);
   const [newImagePreviews, setNewImagePreviews] = useState<string[]>([]);
 
@@ -74,14 +77,16 @@ export default function CarForm({ car, onSuccess, onCancel }: CarFormProps) {
     defaultValues: car ? {
       ...car,
       existingImageUrls: car.imageUrls || [],
+      existingImagePaths: car.imagePaths || [], // Make sure paths are in default values
     } : {
       title: '',
       brand: '',
       model: '',
       year: new Date().getFullYear(),
-      price: 0,
-      km: 0,
+      price: undefined, // Use undefined for placeholder to show
+      km: undefined,    // Use undefined for placeholder to show
       existingImageUrls: [],
+      existingImagePaths: [],
     },
   });
   
@@ -106,8 +111,11 @@ export default function CarForm({ car, onSuccess, onCancel }: CarFormProps) {
       const finalData = { ...data, id: car?.id };
       
       if (isEditMode) {
-        await updateCar(finalData, imagesToRemove);
+        await updateCar(finalData, imagesToRemove, car?.imagePaths || []);
       } else {
+        if (!finalData.images || finalData.images.length === 0) {
+           throw new Error("Yeni ilanlar için en az bir resim gereklidir.");
+        }
         await addCar(finalData);
       }
 
@@ -130,11 +138,11 @@ export default function CarForm({ car, onSuccess, onCancel }: CarFormProps) {
     }
   };
 
-  const removeExistingImage = (imageUrl: string, index: number) => {
-    setImagesToRemove(prev => [...prev, imageUrl]);
-    setImagePreviews(prev => prev.filter((_, i) => i !== index));
-    const currentExisting = watch('existingImageUrls') || [];
-    setValue('existingImageUrls', currentExisting.filter(url => url !== imageUrl), { shouldValidate: true });
+  const removeExistingImage = (urlToRemove: string) => {
+    setImagesToRemove(prev => [...prev, urlToRemove]);
+    setExistingImages(prev => prev.filter(({url}) => url !== urlToRemove));
+    const currentExistingUrls = watch('existingImageUrls') || [];
+    setValue('existingImageUrls', currentExistingUrls.filter(url => url !== urlToRemove), { shouldValidate: true });
   };
   
   const removeNewImage = (indexToRemove: number) => {
@@ -186,14 +194,14 @@ export default function CarForm({ car, onSuccess, onCancel }: CarFormProps) {
         </div>
       </div>
       
-      {isEditMode && imagePreviews.length > 0 && (
+      {isEditMode && existingImages.length > 0 && (
          <div className="space-y-2">
            <Label>Mevcut Resimler</Label>
            <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-             {imagePreviews.map((url, index) => (
+             {existingImages.map(({url}) => (
                <div key={url} className="relative group aspect-square">
-                 <NextImage src={url} alt={`Mevcut resim ${index}`} fill className="object-cover rounded-md" />
-                 <button type="button" onClick={() => removeExistingImage(url, index)} className="absolute top-1 right-1 bg-red-600 text-white rounded-full p-0.5 opacity-75 group-hover:opacity-100 transition-opacity">
+                 <NextImage src={url} alt={`Mevcut resim`} fill className="object-cover rounded-md" />
+                 <button type="button" onClick={() => removeExistingImage(url)} className="absolute top-1 right-1 bg-red-600 text-white rounded-full p-0.5 opacity-75 group-hover:opacity-100 transition-opacity">
                    <X className="h-4 w-4" />
                  </button>
                </div>
@@ -203,7 +211,7 @@ export default function CarForm({ car, onSuccess, onCancel }: CarFormProps) {
       )}
 
       <div className="space-y-2">
-        <Label htmlFor="images">Yeni Resimler Yükle</Label>
+        <Label htmlFor="images">{isEditMode ? 'Yeni Resimler Ekle' : 'Resimler'}</Label>
         <div className="relative flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-card hover:bg-muted/50">
           <div className="flex flex-col items-center justify-center pt-5 pb-6 text-center">
             <UploadCloud className="w-8 h-8 mb-2 text-gray-500" />
@@ -213,14 +221,17 @@ export default function CarForm({ car, onSuccess, onCancel }: CarFormProps) {
           <Controller
             name="images"
             control={control}
-            render={({ field }) => (
+            render={({ field: { onChange, onBlur, name, ref } }) => (
               <Input
                 id="images"
                 type="file"
                 multiple
                 accept={ACCEPTED_IMAGE_TYPES.join(',')}
                 className="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer"
-                onChange={(e) => field.onChange(e.target.files)}
+                onChange={(e) => onChange(e.target.files)}
+                onBlur={onBlur}
+                name={name}
+                ref={ref}
               />
             )}
           />
@@ -255,5 +266,3 @@ export default function CarForm({ car, onSuccess, onCancel }: CarFormProps) {
     </form>
   );
 }
-
-    

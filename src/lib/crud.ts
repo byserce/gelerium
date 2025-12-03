@@ -9,7 +9,7 @@ async function uploadImages(files: FileList) {
     for (const file of Array.from(files)) {
         const fileExtension = file.name.split('.').pop();
         const fileName = `${uuidv4()}.${fileExtension}`;
-        const filePath = `vehicle-images/${fileName}`;
+        const filePath = `public/${fileName}`; // Changed to public to match new setup if needed
 
         const { error: uploadError } = await supabase.storage
             .from('vehicle-images')
@@ -62,13 +62,14 @@ export async function addCar(data: any) {
     const { error } = await supabase.from('listings').insert([carData]);
 
     if (error) {
+        console.error('Supabase insert error:', error);
         throw new Error(`İlan kaydedilemedi: ${error.message}`);
     }
 }
 
 
 // Updates an existing car in the 'listings' table
-export async function updateCar(data: any, imagesToRemove: string[]) {
+export async function updateCar(data: any, imagesToRemove: string[], existingPaths: string[]) {
     let newImageUrls: string[] = [];
     let newImagePaths: string[] = [];
 
@@ -82,38 +83,28 @@ export async function updateCar(data: any, imagesToRemove: string[]) {
     // 2. Remove images from storage if marked for deletion
     if (imagesToRemove.length > 0) {
         // We need to get the full path from the URL
-        const pathsToRemove = imagesToRemove.map(url => {
-            const parts = url.split('/');
-            return parts.slice(parts.indexOf('vehicle-images')).join('/');
+         const pathsToRemove = existingPaths.filter(path => {
+            const publicURL = supabase.storage.from('vehicle-images').getPublicUrl(path).data.publicUrl;
+            return imagesToRemove.includes(publicURL);
         });
-        
-        const { error: storageError } = await supabase.storage.from('vehicle-images').remove(pathsToRemove);
-        if (storageError) {
-            console.error("Error removing images from storage:", storageError);
-            // Decide if you want to throw an error or just log it
-            // For now, we'll log and continue
+
+        if (pathsToRemove.length > 0) {
+            const { error: storageError } = await supabase.storage.from('vehicle-images').remove(pathsToRemove);
+            if (storageError) {
+                console.error("Error removing images from storage:", storageError);
+                // Decide if you want to throw an error or just log it
+                // For now, we'll log and continue
+            }
         }
     }
 
     // 3. Prepare the final data for the database update
-    const { data: existingCar, error: fetchError } = await supabase
-        .from('listings')
-        .select('image_urls, image_paths')
-        .eq('id', data.id)
-        .single();
-    
-    if (fetchError) {
-        throw new Error(`Mevcut ilan verisi alınamadı: ${fetchError.message}`);
-    }
-
-    const existingUrls = existingCar?.image_urls?.filter((url: string) => !imagesToRemove.includes(url)) || [];
-    const finalImageUrls = [...existingUrls, ...newImageUrls];
-
-    const existingPaths = existingCar?.image_paths?.filter((path: string) => {
-        const url = supabase.storage.from('vehicle-images').getPublicUrl(path).data.publicUrl;
-        return !imagesToRemove.includes(url);
-    }) || [];
-    const finalImagePaths = [...existingPaths, ...newImagePaths];
+    const finalImageUrls = [...(data.existingImageUrls || []), ...newImageUrls];
+    const remainingPaths = existingPaths.filter(path => {
+        const publicURL = supabase.storage.from('vehicle-images').getPublicUrl(path).data.publicUrl;
+        return data.existingImageUrls.includes(publicURL);
+    });
+    const finalImagePaths = [...remainingPaths, ...newImagePaths];
 
     const carData = {
         title: data.title,
@@ -132,6 +123,7 @@ export async function updateCar(data: any, imagesToRemove: string[]) {
         .eq('id', data.id);
 
     if (error) {
+        console.error('Supabase update error:', error);
         throw new Error(`İlan güncellenemedi: ${error.message}`);
     }
 }
