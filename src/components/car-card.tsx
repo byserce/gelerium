@@ -61,7 +61,8 @@ export default function CarCard({ car }: CarCardProps) {
       <Link href={`/listings/${car.id}`} className="flex flex-col flex-grow">
         <CardContent className="flex-grow p-3 space-y-2">
           <h3 className="font-headline text-base font-bold h-12 text-foreground leading-tight">{car.title}</h3>
-          <div className="flex flex-col gap-1 text-xs text-muted-foreground">
+          <p className="text-xs text-muted-foreground">{car.brand} / {car.model}</p>
+          <div className="flex flex-col gap-1 text-xs text-muted-foreground pt-1">
             <div className="flex items-center gap-1.5" title="Model Yılı">
               <Calendar className="h-4 w-4 text-accent" />
               <span>{car.year}</span>
