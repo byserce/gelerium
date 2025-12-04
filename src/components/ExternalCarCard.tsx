@@ -53,7 +53,7 @@ export default function ExternalCarCard({ car }: ExternalCarCardProps) {
                 className="mt-auto w-full bg-yellow-400 text-black border-yellow-500 hover:bg-yellow-500 px-2"
             >
                 <div className="flex items-center justify-center gap-1 whitespace-nowrap">
-                    <span className="text-xs sm:hidden">İncele</span>
+                    <span className="text-xs sm:hidden">Sahibinden'de İncele</span>
                     <span className="hidden text-xs sm:inline">Sahibinden'de İncele</span>
                     <ExternalLink className="h-4 w-4" />
                 </div>
