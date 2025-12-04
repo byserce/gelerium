@@ -41,19 +41,20 @@ export default function SahibindenImport() {
 
             const formattedData = parsedData.map((item: any) => {
                 let numericPrice = 0;
-                if (item.price) {
-                    const cleanPrice = String(item.price).replace(/[^0-9]/g, '');
+                if (item.fiyat) {
+                    const cleanPrice = String(item.fiyat).replace(/[^0-9]/g, '');
                     numericPrice = parseInt(cleanPrice, 10) || 0;
                 }
 
+                // Yeni JSON formatına göre alanları eşle
                 return {
-                    sahibinden_id: item.sahibindenId,
-                    title: item.title,
+                    sahibinden_id: item.id, // 'sahibindenId' yerine 'id'
+                    title: item.baslik,      // 'title' yerine 'baslik'
                     price: numericPrice,
-                    model: item.model, // Artık doğrudan JSON'dan alınıyor
-                    year: item.year,   // Artık doğrudan JSON'dan alınıyor
-                    km: item.km,       // Artık doğrudan JSON'dan alınıyor
-                    image_url: item.imageUrl,
+                    model: item.model,
+                    year: item.yil,        // 'year' yerine 'yil'
+                    km: item.km,
+                    image_url: item.resim,   // 'imageUrl' yerine 'resim'
                     original_link: item.link
                 };
             });
@@ -89,7 +90,7 @@ export default function SahibindenImport() {
                     <Label htmlFor="json-data">JSON Verisi</Label>
                     <Textarea
                         id="json-data"
-                        placeholder='[ { "sahibindenId": "...", "title": "...", "model": "Passat", "year": "2022", "km": "50.000" } ]'
+                        placeholder='[ { "id": "...", "baslik": "...", "model": "Passat", "yil": "2022", "km": "50.000" } ]'
                         className="min-h-[200px] font-mono text-xs"
                         value={jsonInput}
                         onChange={(e) => setJsonInput(e.target.value)}
