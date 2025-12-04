@@ -1,37 +1,17 @@
 "use client"
 
-import { APIProvider, Map, Marker } from '@vis.gl/react-google-maps';
-
 export default function DealershipMap() {
-    const position = { lat: 37.7909, lng: 29.4116 }; // Placeholder: Denizli Honaz
-    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
-
-    if (!apiKey) {
-        return (
-            <div className="flex items-center justify-center h-[400px] w-full bg-muted rounded-lg border">
-                <div className="text-center text-muted-foreground p-4">
-                    <p className="font-semibold">Harita Yüklenemedi</p>
-                    <p className="text-sm">Google Maps API anahtarı bulunamadı.</p>
-                    <p className="text-xs mt-2">Lütfen projenizin kök dizininde <code className="bg-background px-1 rounded">.env.local</code> dosyası oluşturup <code className="bg-background px-1 rounded">NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=...</code> değişkenini ekleyin.</p>
-                </div>
-            </div>
-        )
-    }
-
     return (
-        <APIProvider apiKey={apiKey}>
-            <div className="h-[400px] w-full rounded-lg overflow-hidden border shadow-md">
-                <Map
-                    defaultCenter={position}
-                    defaultZoom={15}
-                    gestureHandling={'greedy'}
-                    disableDefaultUI={true}
-                    mapId="avsarli-otomotiv-map"
-                    className="w-full h-full"
-                >
-                    <Marker position={position} />
-                </Map>
-            </div>
-        </APIProvider>
+        <div className="h-[400px] w-full rounded-lg overflow-hidden border shadow-md">
+            <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3151.85787287743!2d29.27938651155049!3d37.81679790962125!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14c719da8b40c017%3A0x27f2963a8708ff54!2sHonaz%20Galericiler%20Sitesi!5e0!3m2!1str!2str!4v1764847639214!5m2!1str!2str"
+                width="100%"
+                height="100%"
+                style={{ border: 0 }}
+                allowFullScreen={true}
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+            ></iframe>
+        </div>
     )
 }
