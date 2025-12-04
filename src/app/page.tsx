@@ -169,7 +169,7 @@ export default function HomePage() {
             )}
 
 
-            <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+            <div className="mt-8 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
               {loading
                 ? Array.from({ length: 8 }).map((_, i) => (
                     <div key={i} className="flex flex-col space-y-3">
