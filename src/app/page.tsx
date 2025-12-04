@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { supabase } from '@/lib/supabaseClient';
+import { getSupabase } from '@/lib/supabaseClient';
 import type { Car, ExternalCar } from '@/lib/types';
 import CarCard from '@/components/car-card';
 import FilterControls from '@/components/filter-controls';
@@ -29,6 +29,7 @@ export default function HomePage() {
   const [internalCars, setInternalCars] = useState<Car[]>([]);
   const [externalCars, setExternalCars] = useState<ExternalCar[]>([]);
   const [loading, setLoading] = useState(true);
+  const supabase = getSupabase();
   
   const initialFilters: Filters = {
     brand: 'all',
@@ -49,6 +50,7 @@ export default function HomePage() {
 
   useEffect(() => {
     const fetchAllCars = async () => {
+      if (!supabase) return;
       setLoading(true);
 
       const { data: internalData, error: internalError } = await supabase.from('listings').select('*');
@@ -93,7 +95,7 @@ export default function HomePage() {
     };
 
     fetchAllCars();
-  }, []);
+  }, [supabase]);
 
   const combinedCars = useMemo(() => {
     return [...internalCars, ...externalCars];

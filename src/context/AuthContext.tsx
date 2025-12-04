@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { supabase } from '@/lib/supabaseClient';
+import { getSupabase } from '@/lib/supabaseClient';
 import type { AuthChangeEvent, Session, User } from '@supabase/supabase-js';
 
 interface AuthContextType {
@@ -18,8 +18,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const supabase = getSupabase();
 
   useEffect(() => {
+    if (!supabase) {
+        setLoading(false);
+        return;
+    };
+
     const getSession = async () => {
         const { data: { session }, error } = await supabase.auth.getSession();
         if (error) {
@@ -43,14 +49,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => {
       authListener?.subscription.unsubscribe();
     };
-  }, []);
+  }, [supabase]);
 
   const value = {
     user,
     session,
     loading,
-    signIn: (email: string, pass: string) => supabase.auth.signInWithPassword({ email, password: pass }),
-    signOut: () => supabase.auth.signOut(),
+    signIn: (email: string, pass: string) => {
+      if (!supabase) throw new Error("Supabase client is not available");
+      return supabase.auth.signInWithPassword({ email, password: pass })
+    },
+    signOut: () => {
+      if (!supabase) throw new Error("Supabase client is not available");
+      return supabase.auth.signOut()
+    },
   };
 
   return (

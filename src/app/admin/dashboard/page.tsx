@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabaseClient';
+import { getSupabase } from '@/lib/supabaseClient';
 import type { Car } from '@/lib/types';
 import CarForm from '@/components/admin/car-form';
 import { Button } from '@/components/ui/button';
@@ -36,8 +36,10 @@ export default function AdminDashboard() {
   const [selectedCar, setSelectedCar] = useState<Car | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const { toast } = useToast();
+  const supabase = getSupabase();
 
   const fetchCars = async () => {
+    if (!supabase) return;
     setLoading(true);
     const { data, error } = await supabase.from('listings').select('*').order('created_at', { ascending: false });
 
@@ -70,7 +72,7 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     fetchCars();
-  }, []);
+  }, [supabase]);
 
   const handleEdit = (car: Car) => {
     setSelectedCar(car);
@@ -83,7 +85,7 @@ export default function AdminDashboard() {
   };
 
   const handleDelete = async (car: Car) => {
-    if (!car.id) return;
+    if (!car.id || !supabase) return;
     try {
       // Delete associated images from storage first
       if (car.imageUrls && car.imageUrls.length > 0) {

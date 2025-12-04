@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { supabase } from '@/lib/supabaseClient';
+import { getSupabase } from '@/lib/supabaseClient';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -11,8 +11,14 @@ export default function SahibindenImport() {
     const [jsonInput, setJsonInput] = useState('');
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+    const supabase = getSupabase();
 
     const handleImport = async () => {
+        if (!supabase) {
+            setMessage({ type: 'error', text: 'Veritabanı bağlantısı kurulamadı.' });
+            return;
+        }
+
         setLoading(true);
         setMessage(null);
 

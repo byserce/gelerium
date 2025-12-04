@@ -1,8 +1,13 @@
-import { supabase } from './supabaseClient';
+'use client';
+
+import { getSupabase } from './supabaseClient';
 import { v4 as uuidv4 } from 'uuid';
 
 // Helper function to upload images and get their URLs and paths
 async function uploadImages(files: File[]) {
+    const supabase = getSupabase();
+    if (!supabase) throw new Error("Supabase client is not available");
+
     const imageUrls: string[] = [];
     const imagePaths: string[] = [];
 
@@ -37,6 +42,9 @@ async function uploadImages(files: File[]) {
 
 // Adds a new car to the 'listings' table
 export async function addCar(carData: any, images: File[]) {
+    const supabase = getSupabase();
+    if (!supabase) throw new Error("Supabase client is not available");
+
     const { imageUrls } = await uploadImages(images);
 
     const { data, error } = await supabase
@@ -66,6 +74,9 @@ export async function addCar(carData: any, images: File[]) {
 
 // Updates an existing car in the 'listings' table
 export async function updateCar(carData: any, newImages: File[], imagesToRemove: string[]) {
+    const supabase = getSupabase();
+    if (!supabase) throw new Error("Supabase client is not available");
+    
     let newImageUrls: string[] = [];
 
     // 1. Upload new images if any
@@ -120,6 +131,9 @@ export async function updateCar(carData: any, newImages: File[], imagesToRemove:
 
 // Deletes a document from a specified table
 export async function deleteDoc(table: string, id: string) {
+    const supabase = getSupabase();
+    if (!supabase) throw new Error("Supabase client is not available");
+    
     const { error } = await supabase.from(table).delete().eq('id', id);
     if (error) {
         throw new Error(`Failed to delete document: ${error.message}`);

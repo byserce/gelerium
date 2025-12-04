@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabaseClient';
+import { getSupabase } from '@/lib/supabaseClient';
 import type { Car } from '@/lib/types';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
@@ -21,10 +21,11 @@ export default function ListingDetailPage({ params }: PageProps) {
   const { id } = params;
   const [car, setCar] = useState<Car | null>(null);
   const [loading, setLoading] = useState(true);
+  const supabase = getSupabase();
 
   useEffect(() => {
     const fetchCar = async () => {
-      if (!id) return;
+      if (!id || !supabase) return;
       setLoading(true);
       const { data, error } = await supabase
         .from('listings')
@@ -47,6 +48,7 @@ export default function ListingDetailPage({ params }: PageProps) {
             imageUrls: data.image_urls || [],
             description: data.description,
             expertise_report: data.expertise_report,
+            source: 'internal'
         };
         setCar(formattedCar);
       }
@@ -54,7 +56,7 @@ export default function ListingDetailPage({ params }: PageProps) {
     };
 
     fetchCar();
-  }, [id]);
+  }, [id, supabase]);
 
   if (loading) {
     return (
