@@ -12,7 +12,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from './ui/button';
-import { RotateCcw } from 'lucide-react';
+import { RotateCcw, Search } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 
@@ -30,9 +30,11 @@ type FilterControlsProps = {
   allCars: CombinedCar[];
   filters: Filters;
   setFilters: React.Dispatch<React.SetStateAction<Filters>>;
+  applyFilters: () => void;
+  initialFilters: Filters;
 };
 
-export default function FilterControls({ allCars, filters, setFilters }: FilterControlsProps) {
+export default function FilterControls({ allCars, filters, setFilters, applyFilters, initialFilters }: FilterControlsProps) {
   const isMobile = useIsMobile();
   
   const brands = ['all', ...Array.from(new Set(allCars.map((car) => car.brand).filter(Boolean)))];
@@ -54,13 +56,8 @@ export default function FilterControls({ allCars, filters, setFilters }: FilterC
   };
   
   const resetFilters = () => {
-    setFilters({
-      brand: 'all',
-      model: 'all',
-      year: 'all',
-      minPrice: 0,
-      maxPrice: 10000000,
-    });
+    setFilters(initialFilters);
+    applyFilters(); // Apply reset immediately or wait for user to click apply again? Let's apply.
   };
 
   const containerClasses = isMobile
@@ -69,7 +66,7 @@ export default function FilterControls({ allCars, filters, setFilters }: FilterC
     
   const gridClasses = isMobile
     ? "flex flex-col gap-4"
-    : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4 items-end";
+    : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 items-end";
 
 
   return (
@@ -133,7 +130,7 @@ export default function FilterControls({ allCars, filters, setFilters }: FilterC
           </Select>
         </div>
 
-        <div className="grid grid-cols-2 gap-2">
+        <div className="col-span-1 lg:col-span-2 grid grid-cols-2 gap-2">
             <div>
                 <Label htmlFor="minPrice">Min Fiyat (₺)</Label>
                 <Input
@@ -156,9 +153,12 @@ export default function FilterControls({ allCars, filters, setFilters }: FilterC
             </div>
         </div>
         
-        <div className="flex items-end h-full">
+        <div className="flex items-end h-full gap-2">
             <Button onClick={resetFilters} variant="outline" className="w-full">
                 <RotateCcw className="mr-2 h-4 w-4" /> Sıfırla
+            </Button>
+             <Button onClick={applyFilters} className="w-full">
+                <Search className="mr-2 h-4 w-4" /> Uygula
             </Button>
         </div>
       </div>

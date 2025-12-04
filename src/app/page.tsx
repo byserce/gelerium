@@ -29,15 +29,23 @@ export default function HomePage() {
   const [internalCars, setInternalCars] = useState<Car[]>([]);
   const [externalCars, setExternalCars] = useState<ExternalCar[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState<Filters>({
+  
+  const initialFilters: Filters = {
     brand: 'all',
     model: 'all',
     year: 'all',
     minPrice: 0,
     maxPrice: 10000000,
-  });
+  };
+
+  const [draftFilters, setDraftFilters] = useState<Filters>(initialFilters);
+  const [appliedFilters, setAppliedFilters] = useState<Filters>(initialFilters);
 
   const isMobile = useIsMobile();
+  
+  const applyFilters = () => {
+    setAppliedFilters(draftFilters);
+  };
 
   useEffect(() => {
     const fetchAllCars = async () => {
@@ -93,7 +101,7 @@ export default function HomePage() {
 
   const combinedAndFilteredCars = useMemo(() => {
     return combinedCars.filter((car) => {
-      const { brand, model, year, minPrice, maxPrice } = filters;
+      const { brand, model, year, minPrice, maxPrice } = appliedFilters;
       
       const carBrand = car.brand;
       const carModel = car.model;
@@ -108,7 +116,7 @@ export default function HomePage() {
     }).sort((a, b) => {
         // Sort internal cars (with created_at) to the top, then by price or other criteria
         const aIsInternal = a.source === 'internal';
-        const bIsInternal = b.source === 'internal';
+        const bIsInternal = b.source === 'external';
 
         if (aIsInternal && !bIsInternal) return -1;
         if (!aIsInternal && bIsInternal) return 1;
@@ -116,11 +124,17 @@ export default function HomePage() {
         // If both are same source, you can add further sorting, e.g. by price
         return b.price - a.price;
     });
-  }, [combinedCars, filters]);
+  }, [combinedCars, appliedFilters]);
 
 
   const FilterComponent = () => (
-    <FilterControls allCars={combinedCars} filters={filters} setFilters={setFilters} />
+    <FilterControls 
+        allCars={combinedCars} 
+        filters={draftFilters} 
+        setFilters={setDraftFilters} 
+        applyFilters={applyFilters}
+        initialFilters={initialFilters}
+    />
   );
 
   return (
