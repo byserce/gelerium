@@ -27,6 +27,8 @@ import { PlusCircle, Edit, Trash2, Image as ImageIcon } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
 import { deleteDoc } from '@/lib/crud';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import SahibindenImport from '@/components/admin/SahibindenImport';
 
 export default function AdminDashboard() {
   const [cars, setCars] = useState<Car[]>([]);
@@ -59,6 +61,7 @@ export default function AdminDashboard() {
           imageUrls: item.image_urls || [],
           description: item.description,
           expertise_report: item.expertise_report,
+          source: 'internal'
         }));
       setCars(formattedData);
     }
@@ -143,111 +146,126 @@ export default function AdminDashboard() {
     <div className="container mx-auto py-10">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Yönetim Paneli</h1>
-        <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
-          <DialogTrigger asChild>
-            <Button onClick={handleAddNew}>
-              <PlusCircle className="mr-2 h-4 w-4" />
-              Yeni İlan Ekle
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[600px]">
-            <DialogHeader>
-              <DialogTitle>{selectedCar ? 'İlanı Düzenle' : 'Yeni İlan Ekle'}</DialogTitle>
-            </DialogHeader>
-            <CarForm
-              car={selectedCar}
-              onSuccess={onFormSuccess}
-              onCancel={onFormCancel}
-            />
-          </DialogContent>
-        </Dialog>
       </div>
 
-      <div className="bg-card p-4 rounded-lg border">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[80px]">Resim</TableHead>
-              <TableHead>Başlık</TableHead>
-              <TableHead>Marka</TableHead>
-              <TableHead>Model</TableHead>
-              <TableHead>Yıl</TableHead>
-              <TableHead>Fiyat</TableHead>
-              <TableHead className="text-right w-[120px]">İşlemler</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {loading ? (
-              Array.from({ length: 5 }).map((_, i) => (
-                <TableRow key={i}>
-                  <TableCell><Skeleton className="h-12 w-16 rounded-md" /></TableCell>
-                  <TableCell><Skeleton className="h-4 w-[250px]" /></TableCell>
-                  <TableCell><Skeleton className="h-4 w-[100px]" /></TableCell>
-                  <TableCell><Skeleton className="h-4 w-[100px]" /></TableCell>
-                  <TableCell><Skeleton className="h-4 w-[50px]" /></TableCell>
-                  <TableCell><Skeleton className="h-4 w-[120px]" /></TableCell>
-                  <TableCell><Skeleton className="h-8 w-[100px]" /></TableCell>
-                </TableRow>
-              ))
-            ) : cars.length > 0 ? (
-              cars.map((car) => (
-                <TableRow key={car.id}>
-                  <TableCell>
-                    {car.imageUrls && car.imageUrls.length > 0 ? (
-                      <img src={car.imageUrls[0]} alt={car.title} className="h-12 w-16 object-cover rounded-md" />
+      <Tabs defaultValue="my-listings" className="w-full">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="my-listings">İlanlarım</TabsTrigger>
+          <TabsTrigger value="import">Sahibinden İçe Aktar</TabsTrigger>
+        </TabsList>
+        <TabsContent value="my-listings">
+            <div className="flex justify-end items-center my-4">
+                <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+                <DialogTrigger asChild>
+                    <Button onClick={handleAddNew}>
+                    <PlusCircle className="mr-2 h-4 w-4" />
+                    Yeni İlan Ekle
+                    </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[600px]">
+                    <DialogHeader>
+                    <DialogTitle>{selectedCar ? 'İlanı Düzenle' : 'Yeni İlan Ekle'}</DialogTitle>
+                    </DialogHeader>
+                    <CarForm
+                    car={selectedCar}
+                    onSuccess={onFormSuccess}
+                    onCancel={onFormCancel}
+                    />
+                </DialogContent>
+                </Dialog>
+            </div>
+            <div className="bg-card p-4 rounded-lg border">
+                <Table>
+                <TableHeader>
+                    <TableRow>
+                    <TableHead className="w-[80px]">Resim</TableHead>
+                    <TableHead>Başlık</TableHead>
+                    <TableHead>Marka</TableHead>
+                    <TableHead>Model</TableHead>
+                    <TableHead>Yıl</TableHead>
+                    <TableHead>Fiyat</TableHead>
+                    <TableHead className="text-right w-[120px]">İşlemler</TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    {loading ? (
+                    Array.from({ length: 5 }).map((_, i) => (
+                        <TableRow key={i}>
+                        <TableCell><Skeleton className="h-12 w-16 rounded-md" /></TableCell>
+                        <TableCell><Skeleton className="h-4 w-[250px]" /></TableCell>
+                        <TableCell><Skeleton className="h-4 w-[100px]" /></TableCell>
+                        <TableCell><Skeleton className="h-4 w-[100px]" /></TableCell>
+                        <TableCell><Skeleton className="h-4 w-[50px]" /></TableCell>
+                        <TableCell><Skeleton className="h-4 w-[120px]" /></TableCell>
+                        <TableCell><Skeleton className="h-8 w-[100px]" /></TableCell>
+                        </TableRow>
+                    ))
+                    ) : cars.length > 0 ? (
+                    cars.map((car) => (
+                        <TableRow key={car.id}>
+                        <TableCell>
+                            {car.imageUrls && car.imageUrls.length > 0 ? (
+                            <img src={car.imageUrls[0]} alt={car.title} className="h-12 w-16 object-cover rounded-md" />
+                            ) : (
+                            <div className="h-12 w-16 rounded-md bg-muted flex items-center justify-center">
+                                <ImageIcon className="h-6 w-6 text-muted-foreground" />
+                            </div>
+                            )}
+                        </TableCell>
+                        <TableCell className="font-medium">{car.title}</TableCell>
+                        <TableCell>{car.brand}</TableCell>
+                        <TableCell>{car.model}</TableCell>
+                        <TableCell>{car.year}</TableCell>
+                        <TableCell>{formatPrice(car.price)}</TableCell>
+                        <TableCell className="text-right">
+                            <div className="flex gap-2 justify-end">
+                            <Button variant="ghost" size="icon" onClick={() => handleEdit(car)}>
+                                <Edit className="h-4 w-4" />
+                            </Button>
+                            <Dialog>
+                                <DialogTrigger asChild>
+                                <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive">
+                                    <Trash2 className="h-4 w-4" />
+                                </Button>
+                                </DialogTrigger>
+                                <DialogContent>
+                                <DialogHeader>
+                                    <DialogTitle>Silme Onayı</DialogTitle>
+                                    <DialogDescription>
+                                    "{car.title}" ilanını kalıcı olarak silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.
+                                    </DialogDescription>
+                                </DialogHeader>
+                                <DialogFooter>
+                                    <DialogClose asChild>
+                                    <Button variant="outline">İptal</Button>
+                                    </DialogClose>
+                                    <DialogClose asChild>
+                                    <Button variant="destructive" onClick={() => handleDelete(car)}>Evet, Sil</Button>
+                                    </DialogClose>
+                                </DialogFooter>
+                                </DialogContent>
+                            </Dialog>
+                            </div>
+                        </TableCell>
+                        </TableRow>
+                    ))
                     ) : (
-                      <div className="h-12 w-16 rounded-md bg-muted flex items-center justify-center">
-                        <ImageIcon className="h-6 w-6 text-muted-foreground" />
-                      </div>
+                        <TableRow>
+                            <TableCell colSpan={7} className="h-24 text-center">
+                                Henüz hiç ilan eklenmemiş.
+                            </TableCell>
+                        </TableRow>
                     )}
-                  </TableCell>
-                  <TableCell className="font-medium">{car.title}</TableCell>
-                  <TableCell>{car.brand}</TableCell>
-                  <TableCell>{car.model}</TableCell>
-                  <TableCell>{car.year}</TableCell>
-                  <TableCell>{formatPrice(car.price)}</TableCell>
-                  <TableCell className="text-right">
-                     <div className="flex gap-2 justify-end">
-                       <Button variant="ghost" size="icon" onClick={() => handleEdit(car)}>
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive">
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent>
-                          <DialogHeader>
-                            <DialogTitle>Silme Onayı</DialogTitle>
-                            <DialogDescription>
-                              "{car.title}" ilanını kalıcı olarak silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.
-                            </DialogDescription>
-                          </DialogHeader>
-                          <DialogFooter>
-                            <DialogClose asChild>
-                              <Button variant="outline">İptal</Button>
-                            </DialogClose>
-                            <DialogClose asChild>
-                              <Button variant="destructive" onClick={() => handleDelete(car)}>Evet, Sil</Button>
-                            </DialogClose>
-                          </DialogFooter>
-                        </DialogContent>
-                      </Dialog>
-                     </div>
-                  </TableCell>
-                </TableRow>
-              ))
-            ) : (
-                <TableRow>
-                    <TableCell colSpan={7} className="h-24 text-center">
-                        Henüz hiç ilan eklenmemiş.
-                    </TableCell>
-                </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
+                </TableBody>
+                </Table>
+            </div>
+        </TabsContent>
+        <TabsContent value="import">
+            <div className="pt-6">
+                <SahibindenImport />
+            </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

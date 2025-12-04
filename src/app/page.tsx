@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/lib/supabaseClient';
-import type { Car } from '@/lib/types';
+import type { Car, ExternalCar } from '@/lib/types';
 import CarCard from '@/components/car-card';
 import FilterControls from '@/components/filter-controls';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Filter } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useIsMobile } from '@/hooks/use-mobile';
+import ExternalCarCard from '@/components/ExternalCarCard';
 
 
 type Filters = {
@@ -22,8 +23,11 @@ type Filters = {
   maxPrice: number;
 };
 
+type CombinedCar = Car | ExternalCar;
+
 export default function HomePage() {
   const [cars, setCars] = useState<Car[]>([]);
+  const [externalCars, setExternalCars] = useState<ExternalCar[]>([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState<Filters>({
     brand: 'all',
@@ -36,44 +40,79 @@ export default function HomePage() {
   const isMobile = useIsMobile();
 
   useEffect(() => {
-    const fetchCars = async () => {
+    const fetchAllCars = async () => {
       setLoading(true);
-      const { data, error } = await supabase.from('listings').select('*');
 
-      if (error) {
-        console.error('Error fetching cars:', error);
-        setCars([]);
-      } else if (data) {
-        const formattedData: Car[] = data.map((item: any) => ({
-          id: item.id,
-          title: item.title,
-          brand: item.brand,
-          model: item.model,
-          year: item.year,
-          price: item.price,
-          km: item.kilometer,
-          imageUrls: item.image_urls || [],
-        }));
-        setCars(formattedData);
+      const { data: internalData, error: internalError } = await supabase.from('listings').select('*');
+      const { data: externalData, error: externalError } = await supabase.from('external_listings').select('*');
+
+      if (internalError) {
+        console.error('Error fetching internal cars:', internalError);
       }
+      if (externalError) {
+        console.error('Error fetching external cars:', externalError);
+      }
+
+      const formattedInternal: Car[] = (internalData || []).map((item: any) => ({
+        id: item.id,
+        title: item.title,
+        brand: item.brand,
+        model: item.model,
+        year: item.year,
+        price: item.price,
+        km: item.kilometer,
+        imageUrls: item.image_urls || [],
+        source: 'internal',
+      }));
+
+      const formattedExternal: ExternalCar[] = (externalData || []).map((item: any) => ({
+        id: item.id,
+        sahibinden_id: item.sahibinden_id,
+        title: item.title,
+        price: item.price,
+        model: item.model,
+        year: item.year,
+        km: item.km,
+        image_url: item.image_url,
+        original_link: item.original_link,
+        source: 'external',
+      }));
+
+      setCars(formattedInternal);
+      setExternalCars(formattedExternal);
       setLoading(false);
     };
 
-    fetchCars();
+    fetchAllCars();
   }, []);
 
-  const filteredCars = useMemo(() => {
-    return cars.filter((car) => {
+  const combinedAndFilteredCars = useMemo(() => {
+    // Note: External cars have string years, internal have numbers.
+    // Filtering will be less effective on external 'Detayda' values.
+    const allCars: CombinedCar[] = [...cars, ...externalCars];
+
+    return allCars.filter((car) => {
       const { brand, model, year, minPrice, maxPrice } = filters;
-      return (
-        (brand === 'all' || car.brand === brand) &&
-        (model === 'all' || car.model === model) &&
-        (year === 'all' || car.year.toString() === year) &&
-        car.price >= (minPrice || 0) &&
-        car.price <= (maxPrice || 10000000)
-      );
-    });
-  }, [cars, filters]);
+      
+      const carBrand = 'brand' in car ? car.brand : 'Detayda'; // External cars don't have a brand field
+      const carModel = car.model;
+      const carYear = car.year.toString();
+
+      const brandMatch = brand === 'all' || carBrand === brand;
+      const modelMatch = model === 'all' || carModel === model;
+      const yearMatch = year === 'all' || carYear === year;
+      const priceMatch = car.price >= (minPrice || 0) && car.price <= (maxPrice || 10000000);
+
+      if (car.source === 'external') {
+         // For external cars, brand/model/year filters might not apply well if data is 'Detayda'
+         // We can simplify and just filter by price for them.
+         return priceMatch;
+      }
+      
+      return brandMatch && modelMatch && yearMatch && priceMatch;
+    }).sort((a, b) => new Date((b as any).created_at || 0).getTime() - new Date((a as any).created_at || 0).getTime());
+  }, [cars, externalCars, filters]);
+
 
   const FilterComponent = () => (
     <FilterControls cars={cars} filters={filters} setFilters={setFilters} />
@@ -111,7 +150,7 @@ export default function HomePage() {
             )}
 
 
-            <div className="mt-8 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+            <div className="mt-8 grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
               {loading
                 ? Array.from({ length: 8 }).map((_, i) => (
                     <div key={i} className="flex flex-col space-y-3">
@@ -123,9 +162,13 @@ export default function HomePage() {
                       </div>
                     </div>
                   ))
-                : filteredCars.map((car) => <CarCard key={car.id} car={car} />)}
+                : combinedAndFilteredCars.map((car) => 
+                    car.source === 'internal' 
+                    ? <CarCard key={`internal-${car.id}`} car={car} />
+                    : <ExternalCarCard key={`external-${car.id}`} car={car} />
+                )}
             </div>
-             {!loading && filteredCars.length === 0 && (
+             {!loading && combinedAndFilteredCars.length === 0 && (
                 <div className="text-center col-span-full py-16">
                     <p className="text-lg text-muted-foreground">Filtrelerinize uygun araç bulunamadı.</p>
                 </div>
