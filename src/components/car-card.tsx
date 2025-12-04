@@ -59,15 +59,17 @@ export default function CarCard({ car }: CarCardProps) {
         </Carousel>
       </CardHeader>
       <Link href={`/listings/${car.id}`} className="flex flex-col flex-grow">
-        <CardContent className="flex-grow p-3 space-y-2">
-          <h3 className="font-headline text-base font-bold h-12 text-foreground leading-tight">{car.title}</h3>
-          <p className="text-xs text-muted-foreground">{car.brand} / {car.model}</p>
-          <div className="flex flex-col gap-1 text-xs text-muted-foreground pt-1">
-            <div className="flex items-center gap-1.5" title="Model Yılı">
+        <CardContent className="flex-grow p-3 flex flex-col justify-between space-y-2">
+          <div>
+            <h3 className="font-headline text-base font-bold text-foreground leading-tight mb-1 h-12">{car.title}</h3>
+            <p className="text-xs text-muted-foreground">{car.brand} / {car.model}</p>
+          </div>
+          <div className="space-y-1">
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground" title="Model Yılı">
               <Calendar className="h-4 w-4 text-accent" />
               <span>{car.year}</span>
             </div>
-            <div className="flex items-center gap-1.5" title="Kilometre">
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground" title="Kilometre">
               <Gauge className="h-4 w-4 text-accent" />
               <span>{car.km.toLocaleString('tr-TR')} km</span>
             </div>
