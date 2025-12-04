@@ -46,13 +46,13 @@ export default function SahibindenImport() {
                     numericPrice = parseInt(cleanPrice, 10) || 0;
                 }
 
-                // Yeni JSON formatına göre alanları eşle
+                // Yeni JSON formatına ve isteklere göre alanları eşle
                 return {
                     sahibinden_id: item.id,
                     title: item.baslik,
                     price: numericPrice,
                     brand: item.marka,
-                    model: item.model,
+                    model: item.seri, // Model olarak "seri" alanını kullan
                     year: item.yil,
                     km: item.km,
                     image_url: item.resim,
@@ -91,7 +91,7 @@ export default function SahibindenImport() {
                     <Label htmlFor="json-data">JSON Verisi</Label>
                     <Textarea
                         id="json-data"
-                        placeholder='[ { "id": "...", "baslik": "...", "model": "Passat", "yil": "2022", "km": "50.000" } ]'
+                        placeholder='[ { "id": "...", "baslik": "...", "marka": "Opel", "seri": "Astra", "yil": "1999", "km": "298.500" } ]'
                         className="min-h-[200px] font-mono text-xs"
                         value={jsonInput}
                         onChange={(e) => setJsonInput(e.target.value)}
