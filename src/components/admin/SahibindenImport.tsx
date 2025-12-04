@@ -48,13 +48,14 @@ export default function SahibindenImport() {
 
                 // Yeni JSON formatına göre alanları eşle
                 return {
-                    sahibinden_id: item.id, // 'sahibindenId' yerine 'id'
-                    title: item.baslik,      // 'title' yerine 'baslik'
+                    sahibinden_id: item.id,
+                    title: item.baslik,
                     price: numericPrice,
+                    brand: item.marka,
                     model: item.model,
-                    year: item.yil,        // 'year' yerine 'yil'
+                    year: item.yil,
                     km: item.km,
-                    image_url: item.resim,   // 'imageUrl' yerine 'resim'
+                    image_url: item.resim,
                     original_link: item.link
                 };
             });

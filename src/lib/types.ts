@@ -17,6 +17,7 @@ export type ExternalCar = {
     sahibinden_id: string;
     title: string;
     price: number;
+    brand: string;
     model: string;
     year: string;
     km: string;

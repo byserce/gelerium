@@ -26,7 +26,7 @@ type Filters = {
 type CombinedCar = Car | ExternalCar;
 
 export default function HomePage() {
-  const [cars, setCars] = useState<Car[]>([]);
+  const [internalCars, setInternalCars] = useState<Car[]>([]);
   const [externalCars, setExternalCars] = useState<ExternalCar[]>([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState<Filters>({
@@ -70,6 +70,7 @@ export default function HomePage() {
         sahibinden_id: item.sahibinden_id,
         title: item.title,
         price: item.price,
+        brand: item.brand,
         model: item.model,
         year: item.year,
         km: item.km,
@@ -78,7 +79,7 @@ export default function HomePage() {
         source: 'external',
       }));
 
-      setCars(formattedInternal);
+      setInternalCars(formattedInternal);
       setExternalCars(formattedExternal);
       setLoading(false);
     };
@@ -86,15 +87,15 @@ export default function HomePage() {
     fetchAllCars();
   }, []);
 
-  const combinedAndFilteredCars = useMemo(() => {
-    // Note: External cars have string years, internal have numbers.
-    // Filtering will be less effective on external 'Detayda' values.
-    const allCars: CombinedCar[] = [...cars, ...externalCars];
+  const combinedCars = useMemo(() => {
+    return [...internalCars, ...externalCars];
+  }, [internalCars, externalCars]);
 
-    return allCars.filter((car) => {
+  const combinedAndFilteredCars = useMemo(() => {
+    return combinedCars.filter((car) => {
       const { brand, model, year, minPrice, maxPrice } = filters;
       
-      const carBrand = 'brand' in car ? car.brand : 'Detayda'; // External cars don't have a brand field
+      const carBrand = car.brand;
       const carModel = car.model;
       const carYear = car.year.toString();
 
@@ -102,20 +103,24 @@ export default function HomePage() {
       const modelMatch = model === 'all' || carModel === model;
       const yearMatch = year === 'all' || carYear === year;
       const priceMatch = car.price >= (minPrice || 0) && car.price <= (maxPrice || 10000000);
-
-      if (car.source === 'external') {
-         // For external cars, brand/model/year filters might not apply well if data is 'Detayda'
-         // We can simplify and just filter by price for them.
-         return priceMatch;
-      }
       
       return brandMatch && modelMatch && yearMatch && priceMatch;
-    }).sort((a, b) => new Date((b as any).created_at || 0).getTime() - new Date((a as any).created_at || 0).getTime());
-  }, [cars, externalCars, filters]);
+    }).sort((a, b) => {
+        // Sort internal cars (with created_at) to the top, then by price or other criteria
+        const aIsInternal = a.source === 'internal';
+        const bIsInternal = b.source === 'internal';
+
+        if (aIsInternal && !bIsInternal) return -1;
+        if (!aIsInternal && bIsInternal) return 1;
+
+        // If both are same source, you can add further sorting, e.g. by price
+        return b.price - a.price;
+    });
+  }, [combinedCars, filters]);
 
 
   const FilterComponent = () => (
-    <FilterControls cars={cars} filters={filters} setFilters={setFilters} />
+    <FilterControls allCars={combinedCars} filters={filters} setFilters={setFilters} />
   );
 
   return (
@@ -164,8 +169,8 @@ export default function HomePage() {
                   ))
                 : combinedAndFilteredCars.map((car) => 
                     car.source === 'internal' 
-                    ? <CarCard key={`internal-${car.id}`} car={car} />
-                    : <ExternalCarCard key={`external-${car.id}`} car={car} />
+                    ? <CarCard key={`internal-${car.id}`} car={car as Car} />
+                    : <ExternalCarCard key={`external-${car.id}`} car={car as ExternalCar} />
                 )}
             </div>
              {!loading && combinedAndFilteredCars.length === 0 && (

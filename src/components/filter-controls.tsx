@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import type { Car } from '@/lib/types';
+import type { Car, ExternalCar } from '@/lib/types';
 import {
   Select,
   SelectContent,
@@ -24,20 +24,24 @@ type Filters = {
   maxPrice: number;
 };
 
+type CombinedCar = Car | ExternalCar;
+
 type FilterControlsProps = {
-  cars: Car[];
+  allCars: CombinedCar[];
   filters: Filters;
   setFilters: React.Dispatch<React.SetStateAction<Filters>>;
 };
 
-export default function FilterControls({ cars, filters, setFilters }: FilterControlsProps) {
+export default function FilterControls({ allCars, filters, setFilters }: FilterControlsProps) {
   const isMobile = useIsMobile();
-  const brands = ['all', ...Array.from(new Set(cars.map((car) => car.brand)))];
+  
+  const brands = ['all', ...Array.from(new Set(allCars.map((car) => car.brand).filter(Boolean)))];
+  
   const models = [
     'all',
-    ...Array.from(new Set(cars.filter(car => filters.brand === 'all' || car.brand === filters.brand).map((car) => car.model))),
+    ...Array.from(new Set(allCars.filter(car => filters.brand === 'all' || car.brand === filters.brand).map((car) => car.model).filter(Boolean))),
   ];
-  const years = ['all', ...Array.from(new Set(cars.map((car) => car.year.toString()))).sort((a,b) => Number(b) - Number(a))];
+  const years = ['all', ...Array.from(new Set(allCars.map((car) => car.year.toString()).filter(Boolean))).sort((a,b) => Number(b) - Number(a))];
 
   const handleFilterChange = (key: keyof Filters, value: string | number) => {
     setFilters((prev) => {
