@@ -31,15 +31,17 @@ export default function ExternalCarCard({ car }: ExternalCarCardProps) {
             />
         </div>
         <CardContent className="flex-grow p-3 space-y-2 flex flex-col">
-            <h3 className="font-headline text-base font-bold h-12 text-foreground leading-tight">{car.title}</h3>
-            <div className="flex flex-col gap-1 text-xs text-muted-foreground">
+            <h3 className="font-headline text-sm font-bold h-10 text-foreground leading-tight">{car.title}</h3>
+            <p className="text-xs text-muted-foreground">{car.brand} / {car.model}</p>
+
+            <div className="flex flex-col gap-1 text-xs text-muted-foreground pt-1">
                 <div className="flex items-center gap-1.5" title="Model Yılı">
                     <Calendar className="h-4 w-4 text-accent" />
                     <span>{car.year}</span>
                 </div>
                 <div className="flex items-center gap-1.5" title="Kilometre">
                     <Gauge className="h-4 w-4 text-accent" />
-                    <span>{car.km}</span>
+                    <span>{car.km} km</span>
                 </div>
             </div>
             <p className="text-xl font-bold text-primary flex items-center gap-2 pt-1">
