@@ -17,6 +17,16 @@ export default function SahibindenImport() {
         setMessage(null);
 
         try {
+            // 0. Önceki tüm dış ilanları sil
+            const { error: deleteError } = await supabase
+                .from('external_listings')
+                .delete()
+                .neq('id', -1); // Bu koşul tüm satırları hedefler
+
+            if (deleteError) {
+                throw new Error(`Eski ilanlar silinirken hata oluştu: ${deleteError.message}`);
+            }
+            
             // 1. JSON verisini parse et
             let parsedData;
             try {
@@ -26,15 +36,12 @@ export default function SahibindenImport() {
             }
 
             if (!Array.isArray(parsedData)) {
-                // Eğer tek bir obje gelirse diziye çevir
                 parsedData = [parsedData];
             }
 
             const formattedData = parsedData.map((item: any) => {
-                // Fiyat temizleme: "319.900 TL" -> 319900
                 let numericPrice = 0;
                 if (item.price) {
-                    // Sadece rakamları bırak
                     const cleanPrice = String(item.price).replace(/[^0-9]/g, '');
                     numericPrice = parseInt(cleanPrice, 10) || 0;
                 }
@@ -43,23 +50,23 @@ export default function SahibindenImport() {
                     sahibinden_id: item.sahibindenId,
                     title: item.title,
                     price: numericPrice,
-                    model: item.model || 'Belirtilmemiş',
-                    year: item.year || 'Belirtilmemiş',
-                    km: item.km || 'Belirtilmemiş',
+                    model: item.model, // Artık doğrudan JSON'dan alınıyor
+                    year: item.year,   // Artık doğrudan JSON'dan alınıyor
+                    km: item.km,       // Artık doğrudan JSON'dan alınıyor
                     image_url: item.imageUrl,
                     original_link: item.link
                 };
             });
 
-            // 2. Veritabanına kaydet (Upsert: Varsa güncelle, yoksa ekle)
+            // 2. Veritabanına yeni verileri kaydet
             const { error } = await supabase
                 .from('external_listings')
-                .upsert(formattedData, { onConflict: 'sahibinden_id' });
+                .insert(formattedData);
 
             if (error) throw error;
 
-            setMessage({ type: 'success', text: `${formattedData.length} ilan başarıyla içe aktarıldı!` });
-            setJsonInput(''); // Başarılı olursa kutuyu temizle
+            setMessage({ type: 'success', text: `${formattedData.length} ilan başarıyla içe aktarıldı! (Önceki ilanlar silindi)` });
+            setJsonInput(''); 
 
         } catch (error: any) {
             console.error('İçe aktarma hatası:', error);
@@ -74,7 +81,7 @@ export default function SahibindenImport() {
             <CardHeader>
                 <CardTitle>Sahibinden JSON İçe Aktar</CardTitle>
                 <CardDescription>
-                    Sahibinden.com verilerini JSON formatında buraya yapıştırın.
+                    Sahibinden.com verilerini JSON formatında buraya yapıştırın. Her içe aktarma işleminde önceki tüm dış kaynaklı ilanlar silinir ve yenileri eklenir.
                 </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -82,7 +89,7 @@ export default function SahibindenImport() {
                     <Label htmlFor="json-data">JSON Verisi</Label>
                     <Textarea
                         id="json-data"
-                        placeholder='[ { "sahibindenId": "...", "title": "..." } ]'
+                        placeholder='[ { "sahibindenId": "...", "title": "...", "model": "Passat", "year": "2022", "km": "50.000" } ]'
                         className="min-h-[200px] font-mono text-xs"
                         value={jsonInput}
                         onChange={(e) => setJsonInput(e.target.value)}
@@ -95,8 +102,8 @@ export default function SahibindenImport() {
                     </div>
                 )}
 
-                <Button onClick={handleImport} disabled={loading} className="w-full">
-                    {loading ? 'İçe Aktarılıyor...' : 'İlanları Kaydet'}
+                <Button onClick={handleImport} disabled={loading || !jsonInput} className="w-full">
+                    {loading ? 'İçe Aktarılıyor...' : 'İlanları Sil ve İçe Aktar'}
                 </Button>
             </CardContent>
         </Card>
